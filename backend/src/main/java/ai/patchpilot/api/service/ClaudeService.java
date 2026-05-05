@@ -85,7 +85,7 @@ public class ClaudeService {
 
             @SuppressWarnings("unchecked")
             List<Map<String, Object>> content = (List<Map<String, Object>>) response.get("content");
-            return (String) content.get(0).get("text");
+            return extractJson((String) content.get(0).get("text"));
 
         } catch (HttpClientErrorException e) {
             throw new ClaudeApiException(
@@ -96,6 +96,28 @@ public class ClaudeService {
         } catch (RestClientException e) {
             throw new ClaudeApiException("Failed to reach Claude API: " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * Strips markdown code fences that Claude sometimes wraps around JSON responses.
+     * Handles {@code ```json}, {@code ```JSON}, and plain {@code ```} opening fences.
+     * Safe to call with null or empty input — returns the value unchanged.
+     */
+    String extractJson(String rawResponse) {
+        if (rawResponse == null || rawResponse.isEmpty()) {
+            return rawResponse;
+        }
+        String trimmed = rawResponse.trim();
+        if (trimmed.toLowerCase().startsWith("```")) {
+            // Strip the opening fence line (```json, ```JSON, ``` etc.)
+            int newline = trimmed.indexOf('\n');
+            trimmed = (newline != -1) ? trimmed.substring(newline + 1) : trimmed.substring(3);
+            // Strip the closing ```
+            if (trimmed.endsWith("```")) {
+                trimmed = trimmed.substring(0, trimmed.length() - 3);
+            }
+        }
+        return trimmed.trim();
     }
 
     private String buildUserPrompt(TroubleshootRequest req, List<KnowledgeBaseArticle> articles) {
