@@ -19,14 +19,9 @@ export const Nav = ({ scrolled }) => {
   return (
     <nav className={"nav " + (scrolled ? "nav-blur" : "")}>
       <div className="nav-pill">
-        <a href="/" className="nav-brand">
-          <span className="nav-mark" style={{ ringWidth: 1, borderRadius: "10px" }}>
-            <ITarget size={18} style={{ color: "#04121C", strokeWidth: 2.25 }} />
-          </span>
-          <span className="nav-brand-text">
-            PatchPilot
-            <span className="pulse-dot" />
-          </span>
+    <a href="/" className="nav-brand">
+          <img src="/logo-full.png" alt="PatchPilot" className="nav-logo-img" />
+          <span className="pulse-dot" />
         </a>
         <div className="nav-links">
           {NAV_LINKS.map((l, i) =>
@@ -39,7 +34,7 @@ export const Nav = ({ scrolled }) => {
           </a>
           <a className="btn btn-primary" href="#" style={{ borderRadius: 9999 }}>
             <span className="nav-cta-text">Try PatchPilot</span>
-            <IArrowRight size={14} />
+            <IArrowRight size={15} />
           </a>
           <button className="nav-hamburger" aria-label="Open menu" onClick={() => setOpen((o) => !o)}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">

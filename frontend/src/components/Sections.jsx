@@ -217,12 +217,9 @@ export const Footer = () => (
   <footer className="footer">
     <div className="container">
       <div className="footer-row">
-        <div className="footer-brand">
+      <div className="footer-brand">
           <div className="row1">
-            <span className="nav-mark" style={{ width: 22, height: 22 }}>
-              <ITarget size={12} style={{ color: "#04121C", strokeWidth: 2.25 }} />
-            </span>
-            <span>PatchPilot</span>
+            <img src="/logo-full.png" alt="PatchPilot" className="footer-logo-img" />
           </div>
           <div>Built by Arpit Patel · Computer Programming, Humber College</div>
           <div className="mono" style={{ fontSize: 11, color: "var(--text-tertiary)", marginTop: 4 }}>

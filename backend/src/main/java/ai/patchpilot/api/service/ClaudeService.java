@@ -1,8 +1,11 @@
 package ai.patchpilot.api.service;
 
+import ai.patchpilot.api.dto.DiagnosisResult;
 import ai.patchpilot.api.dto.TroubleshootRequest;
 import ai.patchpilot.api.exception.ClaudeApiException;
 import ai.patchpilot.api.model.KnowledgeBaseArticle;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -47,8 +50,10 @@ public class ClaudeService {
             """;
 
     private final RestClient restClient;
+    private final ObjectMapper objectMapper;
 
-    public ClaudeService(@Value("${ANTHROPIC_API_KEY}") String apiKey) {
+    public ClaudeService(@Value("${ANTHROPIC_API_KEY}") String apiKey, ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
         this.restClient = RestClient.builder()
                 .defaultHeader("x-api-key", apiKey)
                 .defaultHeader("anthropic-version", "2023-06-01")
@@ -58,12 +63,7 @@ public class ClaudeService {
 
     /**
      * Sends the user's installation problem to Claude along with matching KB articles
-     * and returns the raw JSON diagnosis string.
-     *
-     * @param request          the validated user request
-     * @param relevantArticles KB articles matched to the user's software / error
-     * @return raw JSON string conforming to the PatchPilot diagnosis schema
-     * @throws ClaudeApiException if the Claude API returns an error or is unreachable
+     * and returns the raw JSON diagnosis string suitable for DB persistence.
      */
     public String diagnose(TroubleshootRequest request, List<KnowledgeBaseArticle> relevantArticles) {
         String userContent = buildUserPrompt(request, relevantArticles);
@@ -99,6 +99,22 @@ public class ClaudeService {
     }
 
     /**
+     * Parses a raw diagnosis JSON string (as stored in the DB) into a typed
+     * {@link DiagnosisResult}. Used by the controller to expose structured data
+     * to API consumers without leaking the JSON-as-string representation.
+     */
+    public DiagnosisResult parseDiagnosis(String rawJson) {
+        if (rawJson == null || rawJson.isBlank()) {
+            return null;
+        }
+        try {
+            return objectMapper.readValue(rawJson, DiagnosisResult.class);
+        } catch (JsonProcessingException e) {
+            throw new ClaudeApiException("Stored diagnosis is not valid JSON: " + e.getOriginalMessage(), e);
+        }
+    }
+
+    /**
      * Strips markdown code fences that Claude sometimes wraps around JSON responses.
      * Handles {@code ```json}, {@code ```JSON}, and plain {@code ```} opening fences.
      * Safe to call with null or empty input — returns the value unchanged.
@@ -109,10 +125,8 @@ public class ClaudeService {
         }
         String trimmed = rawResponse.trim();
         if (trimmed.toLowerCase().startsWith("```")) {
-            // Strip the opening fence line (```json, ```JSON, ``` etc.)
             int newline = trimmed.indexOf('\n');
             trimmed = (newline != -1) ? trimmed.substring(newline + 1) : trimmed.substring(3);
-            // Strip the closing ```
             if (trimmed.endsWith("```")) {
                 trimmed = trimmed.substring(0, trimmed.length() - 3);
             }

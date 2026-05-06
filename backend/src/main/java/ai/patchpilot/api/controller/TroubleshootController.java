@@ -1,5 +1,6 @@
 package ai.patchpilot.api.controller;
 
+import ai.patchpilot.api.dto.DiagnosisResult;
 import ai.patchpilot.api.dto.TroubleshootRequest;
 import ai.patchpilot.api.dto.TroubleshootResponse;
 import ai.patchpilot.api.model.TroubleshootingTicket;
@@ -31,7 +32,11 @@ public class TroubleshootController {
 
     /**
      * Accepts an installation problem, matches relevant KB articles, calls Claude for
-     * a diagnosis, persists the ticket, and returns the AI response with the ticket ID.
+     * a diagnosis, persists the ticket with the raw JSON, and returns a typed response.
+     *
+     * <p>The diagnosis is stored as raw JSON in the DB (cheap reads, single-document
+     * access) but parsed into {@link DiagnosisResult} at the API boundary so frontend
+     * consumers get clean structured data.</p>
      */
     @PostMapping("/diagnose")
     public ResponseEntity<TroubleshootResponse> diagnose(@Valid @RequestBody TroubleshootRequest request) {
@@ -43,8 +48,10 @@ public class TroubleshootController {
         var relevantArticles = kbRepo.findBySoftwareContainingIgnoreCaseOrErrorPatternContainingIgnoreCase(
                 request.getSoftware(), errorKeywords);
 
-        String diagnosis = claudeService.diagnose(request, relevantArticles);
+        // 1. Call Claude — returns raw JSON string for persistence
+        String rawDiagnosis = claudeService.diagnose(request, relevantArticles);
 
+        // 2. Persist the ticket with the raw JSON in a TEXT column
         TroubleshootingTicket ticket = TroubleshootingTicket.builder()
                 .software(request.getSoftware())
                 .softwareVersion(request.getSoftwareVersion())
@@ -52,9 +59,12 @@ public class TroubleshootController {
                 .errorMessage(request.getErrorMessage())
                 .userAttempts(request.getUserAttempts())
                 .severity(request.getSeverity())
-                .aiDiagnosis(diagnosis)
+                .aiDiagnosis(rawDiagnosis)
                 .build();
         ticket = ticketRepo.save(ticket);
+
+        // 3. Parse the raw JSON into a typed DTO for the API response
+        DiagnosisResult diagnosis = claudeService.parseDiagnosis(rawDiagnosis);
 
         return ResponseEntity.ok(TroubleshootResponse.builder()
                 .ticketId(ticket.getId())

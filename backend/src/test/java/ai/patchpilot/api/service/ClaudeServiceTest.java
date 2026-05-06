@@ -1,5 +1,6 @@
 package ai.patchpilot.api.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +13,7 @@ class ClaudeServiceTest {
     @BeforeEach
     void setUp() {
         // Construct with a dummy key — no HTTP calls are made in these tests
-        service = new ClaudeService("test-api-key");
+        service = new ClaudeService("dummy-key", new ObjectMapper());
     }
 
     @Test

@@ -12,6 +12,9 @@ import java.time.LocalDateTime;
 public class TroubleshootResponse {
 
     private Long ticketId;
-    private String diagnosis;
+
+    /** Structured Claude diagnosis — see {@link DiagnosisResult}. */
+    private DiagnosisResult diagnosis;
+
     private LocalDateTime createdAt;
 }
