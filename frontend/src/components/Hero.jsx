@@ -1,17 +1,16 @@
 // PatchPilot — Nav, Hero, Product preview
 import React from "react";
 import {
-  ITarget, IGithub, IArrowRight, IPlay,
+  ITarget, IGithub, IArrowRight,
   ISearch, ISparkles, IBook, IShield,
-  ICheck, ITerminal
+  ICheck, ITerminal, IMail
 } from "./Icons";
 
 const NAV_LINKS = [
   { href: "#how", label: "How it works" },
   { href: "#features", label: "Features" },
   { href: "#kb", label: "Knowledge base" },
-  { href: "#docs", label: "Docs" },
-  { href: "#changelog", label: "Changelog" }
+  { href: "#architecture", label: "Architecture" }
 ];
 
 export const Nav = ({ scrolled }) => {
@@ -23,18 +22,22 @@ export const Nav = ({ scrolled }) => {
           <img src="/logo-full.png" alt="PatchPilot" className="nav-logo-img" />
           <span className="pulse-dot" />
         </a>
-        <div className="nav-links">
-          {NAV_LINKS.map((l, i) =>
-            <a key={l.href} href={l.href} className={i === 0 ? "active" : ""}>{l.label}</a>
+       <div className="nav-links">
+          {NAV_LINKS.map((l) =>
+            <a key={l.href} href={l.href}>
+              <span>{l.label}</span>
+            </a>
           )}
         </div>
         <div className="nav-right">
-          <a className="btn btn-ghost" href="#" aria-label="GitHub" style={{ width: 40, height: 40, padding: 0, justifyContent: "center", borderRadius: 9999 }}>
-            <IGithub size={18} />
+         <a className="btn btn-ghost" href="mailto:YOUR_EMAIL_HERE" aria-label="Email Arpit" style={{ width: 40, height: 40, padding: 0, justifyContent: "center", borderRadius: 9999 }}>
+            <IMail size={18} />
           </a>
-          <a className="btn btn-primary" href="#" style={{ borderRadius: 9999 }}>
+          <a className="btn btn-primary btn-cta" href="#diagnose" style={{ borderRadius: 9999 }}>
             <span className="nav-cta-text">Try PatchPilot</span>
-            <IArrowRight size={15} />
+            <span className="btn-cta-arrow">
+              <IArrowRight size={15} />
+            </span>
           </a>
           <button className="nav-hamburger" aria-label="Open menu" onClick={() => setOpen((o) => !o)}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -103,7 +106,41 @@ export const InView = ({ children, className = "", as: Tag = "div", variant = "i
 };
 
 
+const ROTATING_PHRASES = [
+  "installation failures",
+  "error 1603 codes",
+  "MSI registration",
+  "crash log mysteries"
+];
 
+const RotatingPhrase = () => {
+  const [index, setIndex] = React.useState(0);
+  const [animKey, setAnimKey] = React.useState(0);
+
+  React.useEffect(() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) return;
+
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % ROTATING_PHRASES.length);
+      setAnimKey((k) => k + 1);
+    }, 3200);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <span className="rotating-phrase">
+      <span
+        key={animKey}
+        className="rotating-phrase-inner word-reveal"
+        style={{ animationDelay: animKey === 0 ? "210ms" : "0ms" }}
+      >
+        {ROTATING_PHRASES[index]}
+      </span>
+    </span>
+  );
+};
 
 export const Hero = ({ gradient }) =>
   <section className="hero" data-gradient={gradient}>
@@ -120,39 +157,55 @@ export const Hero = ({ gradient }) =>
         <span>Now in beta</span>
       </div>
 
-      <h1 className="hero-title anim-title">
-        Diagnose installation failures<br />
-        in <span className="accent-word">seconds</span>, not hours.
+<h1 className="hero-title anim-title">
+        <span className="word-reveal" style={{ animationDelay: "150ms" }}>Diagnose</span>
+        {" "}
+        <RotatingPhrase />
+        <br />
+        <span className="word-reveal" style={{ animationDelay: "330ms" }}>in</span>
+        {" "}
+        <span className="word-reveal accent-word accent-shimmer" style={{ animationDelay: "390ms" }}>seconds</span>
+        <span className="word-reveal" style={{ animationDelay: "450ms" }}>,</span>
+        {" "}
+        <span className="word-reveal" style={{ animationDelay: "510ms" }}>not</span>
+        {" "}
+        <span className="word-reveal" style={{ animationDelay: "570ms" }}>hours.</span>
       </h1>
 
       <p className="hero-sub anim-sub">
         PatchPilot is an AI copilot for IT support teams. Describe your error in plain
-        language — get probability-ranked diagnoses and step-by-step fixes.
+        language - get probability-ranked diagnoses and step-by-step fixes.
       </p>
 
       <div className="hero-ctas anim-ctas">
-        <a className="btn btn-primary btn-large" href="#">
-          Try it free
-          <IArrowRight size={15} />
+        <a className="btn btn-primary btn-large btn-cta" href="#diagnose">
+          <span className="nav-cta-text">Try it free</span>
+          <span className="btn-cta-arrow">
+            <IArrowRight size={15} />
+          </span>
         </a>
-        <a className="btn btn-secondary btn-large" href="#">
-          <IPlay size={13} />
-          Watch demo
+        <a className="btn btn-secondary btn-large" href="#" target="_blank" rel="noopener noreferrer">
+          <IGithub size={14} />
+          View on GitHub
         </a>
       </div>
 
-      <div className="hero-meta anim-meta">
-        <span>Powered by Claude</span>
-        <span className="pip" />
+     <div className="hero-meta anim-meta">
         <span>8 KB articles seeded</span>
         <span className="pip" />
         <span>Open source</span>
       </div>
+
+      <a href="#diagnose" className="scroll-cue" aria-label="Scroll to diagnose form">
+        <span className="scroll-cue-text">Try it below</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 5v14" />
+          <path d="M19 12l-7 7-7-7" />
+        </svg>
+      </a>
     </div>
 
-    <InView className="container preview-wrap" threshold={0.05}>
-      <ProductPreviewInner />
-    </InView>
+    
   </section>;
 
 const OS_OPTIONS = [

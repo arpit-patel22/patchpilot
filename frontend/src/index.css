@@ -63,6 +63,98 @@ body {
   .container { padding: 0 20px; }
 }
 
+/* ─── Smooth scroll for anchor navigation ─── */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 96px; /* offset for fixed nav pill */
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+/* ─── Headline word-by-word reveal ─── */
+@keyframes wordReveal {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.hero-title {
+  /* Override the .anim-title fade — we're animating per-word now */
+  opacity: 1 !important;
+  animation: none !important;
+}
+
+.word-reveal {
+  display: inline-block;
+  animation: wordReveal 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: opacity, transform, filter;
+  /* Inherit the parent's gradient text */
+  background: inherit;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* The accent shimmer span has its own gradient — don't inherit */
+.word-reveal.accent-shimmer {
+  background: linear-gradient(
+    120deg,
+    #34D399 0%,
+    #6EE7B7 25%,
+    #A7F3D0 50%,
+    #6EE7B7 75%,
+    #34D399 100%
+  );
+  background-size: 200% auto;
+}
+
+/* ─── Accent shimmer on "seconds" ─── */
+@keyframes accentShimmer {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.accent-shimmer {
+  background: linear-gradient(
+    110deg,
+    #34D399 0%,
+    #6EE7B7 20%,
+    #FFFFFF 50%,
+    #6EE7B7 80%,
+    #34D399 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: wordReveal 600ms cubic-bezier(0.22, 1, 0.36, 1) forwards,
+             accentShimmer 4s ease-in-out infinite;
+  animation-delay: 390ms, 1200ms; /* shimmer kicks in after the reveal settles */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .word-reveal {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+  .accent-shimmer {
+    animation: none !important;
+    opacity: 1 !important;
+    background-position: 0% 50% !important;
+  }
+}
+
 /* ─── Nav (floating pill — fixed, heavy frosted glass) ─── */
 .nav {
   position: fixed;
@@ -203,14 +295,14 @@ body {
   height: 40px;
   border-radius: 9999px;
   background: transparent;
-  border: 1px solid var(--border);
+  border: 1px solid var(--accent-dim);
   color: var(--text-secondary);
   cursor: pointer;
   align-items: center;
   justify-content: center;
   transition: all 200ms;
 }
-.nav-hamburger:hover { color: var(--text-primary); border-color: var(--border-strong); }
+.nav-hamburger:hover { color: var(--text-primary); border-color: var(--accent); }
 .nav-mobile-icon { display: none; }
 
 @media (max-width: 1024px) {
@@ -314,10 +406,9 @@ body {
   position: relative;
   padding: 80px 0 0;
   overflow: hidden;
-  /* nav is fixed now, so add top padding for the floating pill */
-  padding-top: 96px;
+  padding-top: 140px;
 }
-@media (max-width: 768px) { .hero { padding-top: 88px; } }
+@media (max-width: 768px) { .hero { padding-top: 137px; } }
 
 /* ─── Entrance animation utilities ─── */
 @keyframes fadeUp {
@@ -933,13 +1024,16 @@ textarea.field-input {
 }
 .step {
   position: relative;
-  overflow: hidden;
-  padding: 56px 28px 28px;
+  overflow: visible;
+  padding: 28px;
   border: 1px solid var(--border);
   border-radius: 12px;
   background: var(--surface);
   transition: all 250ms ease-out;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 .step:hover {
   transform: translateY(-2px);
@@ -947,24 +1041,36 @@ textarea.field-input {
   box-shadow: 0 10px 30px -15px rgba(56, 189, 248, 0.2);
 }
 .step-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: rgba(56, 189, 248, 0.1);
-  border: 1px solid rgba(56, 189, 248, 0.2);
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.25);
   color: var(--accent);
   display: grid;
   place-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 0;
+  transition: all 250ms ease-out;
+  box-shadow: 0 0 0 0 rgba(52, 211, 153, 0);
+}
+
+.step-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.step:hover .step-icon {
+  background: rgba(52, 211, 153, 0.15);
+  border-color: rgba(52, 211, 153, 0.45);
+  transform: scale(1.05);
+  box-shadow: 0 0 24px -4px rgba(52, 211, 153, 0.4);
 }
 .step-num {
-  position: absolute;
-  top: 20px;
-  left: 28px;
   font-family: 'JetBrains Mono', monospace;
   font-size: 11px;
   color: var(--text-tertiary);
   letter-spacing: 0.06em;
+  margin-bottom: 4px;
 }
 .step h3 {
   font-size: 17px;
@@ -977,17 +1083,6 @@ textarea.field-input {
   color: var(--text-secondary);
   line-height: 1.55;
   margin: 0;
-}
-.step-connector {
-  position: absolute;
-  top: 48px;
-  right: -16px;
-  width: 16px;
-  height: 1px;
-  background: linear-gradient(90deg, var(--border-strong), transparent);
-}
-@media (max-width: 880px) {
-  .step-connector { display: none; }
 }
 
 /* ─── Features ─── */
@@ -1025,6 +1120,8 @@ textarea.field-input {
   transition: opacity 250ms ease-out;
   pointer-events: none;
   z-index: 0;
+  border-radius: inherit;
+  clip-path: inset(0 round 12px);
 }
 .step:hover::before, .feature:hover::before, .kb:hover::before { opacity: 1; }
 .step > *, .feature > *, .kb > * { position: relative; z-index: 1; }
@@ -1138,118 +1235,141 @@ textarea.field-input {
 }
 .kb-foot .arrow { color: var(--accent); }
 
-/* ─── CTA band ─── */
-.cta-band {
-  position: relative;
-  border-radius: 20px;
-  padding: clamp(48px, 8vw, 80px) clamp(24px, 4vw, 32px);
-  text-align: center;
-  background:
-    radial-gradient(ellipse 70% 80% at 50% 0%, rgba(56, 189, 248, 0.18), transparent 60%),
-    radial-gradient(ellipse 50% 60% at 50% 100%, rgba(167, 139, 250, 0.12), transparent 70%),
-    linear-gradient(180deg, rgba(20, 20, 30, 0.6), rgba(10, 10, 15, 0.8));
-  border: 1px solid var(--border-strong);
-  overflow: hidden;
-}
-.cta-band::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-  background-size: 48px 48px;
-  mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, black, transparent 80%);
-  -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, black, transparent 80%);
-  pointer-events: none;
-}
-.cta-band > * { position: relative; }
-.cta-band h2 {
-  font-size: clamp(28px, 4.5vw, 44px);
-  font-weight: 600;
-  letter-spacing: -0.025em;
-  line-height: 1.1;
-  margin: 0 0 14px;
-  text-wrap: balance;
-}
-.cta-band p {
-  color: var(--text-secondary);
-  font-size: 17px;
-  margin: 0 auto 28px;
-  max-width: 480px;
-  text-wrap: pretty;
-}
+
 
 /* ─── Footer ─── */
 footer.footer {
   border-top: 1px solid var(--border);
-  padding: 48px 0 64px;
-  margin-top: 96px;
+  padding: 48px 0 32px;
+  margin-top: 64px;
 }
+
 .footer-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1.2fr 2fr;
+  gap: 48px;
   align-items: flex-start;
-  justify-content: space-between;
-  gap: 32px;
-  flex-wrap: wrap;
 }
-@media (max-width: 640px) {
-  .footer-row { flex-direction: column; align-items: center; text-align: center; }
-  .footer-brand { align-items: center; }
-  .footer-brand .row1 { justify-content: center; }
+
+@media (max-width: 768px) {
+  .footer-row {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .footer-brand {
+    align-items: center;
+    text-align: center;
+  }
 }
+
 .footer-brand {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+}
+
+/* Footer logo — single source of truth, scales cleanly at all viewports */
+.footer-logo-img {
+  height: 36px;
+  width: auto;
+  max-width: 200px;
+  display: block;
+  object-fit: contain;
+  margin-right: 1rem;
+  padding: 0;
+
+}
+@media (max-width: 768px) {
+  .footer-logo-img {
+    height: 36px;
+  }
+}
+
+.footer-tagline {
   font-size: 13px;
   color: var(--text-tertiary);
+  line-height: 1.5;
+  max-width: 280px;
+  margin: 0;
 }
-.footer-brand .row1 {
-  display: flex; align-items: center; gap: 10px;
-  color: var(--text-primary);
-  font-weight: 600;
-  font-size: 14px;
-  text-decoration: none;
+
+.footer-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
 }
-.footer-links {
+
+@media (max-width: 480px) {
+  .footer-cols { grid-template-columns: 1fr; }
+}
+
+.footer-col {
   display: flex;
-  gap: 20px;
-  align-items: center;
-  font-size: 13px;
+  flex-direction: column;
+  gap: 10px;
 }
-.footer-links a {
+
+.footer-col-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+
+.footer-col a,
+.footer-col span {
   color: var(--text-secondary);
   text-decoration: none;
-  cursor: pointer;
-  transition: color 200ms, transform 200ms;
-  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 200ms ease-out, transform 200ms ease-out;
 }
-.footer-links a:hover { color: var(--text-primary); transform: translateY(-1px); }
+
+.footer-col a {
+  cursor: pointer;
+}
+
+.footer-col a:hover {
+  color: var(--text-primary);
+  transform: translateX(2px);
+}
+
+.footer-col a svg {
+  color: var(--text-tertiary);
+  transition: color 200ms ease-out;
+}
+
+.footer-col a:hover svg {
+  color: var(--accent);
+}
+
 .footer-fine {
-  margin-top: 32px;
+  margin-top: 40px;
   padding-top: 24px;
   border-top: 1px solid var(--border);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--text-tertiary);
   display: flex;
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
+}
+
+.footer-fine .mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
 }
 
 /* ─── Custom logo overrides ─── */
+/* ─── Custom logo overrides ─── */
 .nav-logo-img {
-  height: 12rem;
-  width: auto;
-  display: block;
-  object-fit: contain;
-}
-
-.footer-logo-img {
-  height: 13rem;
+  height: 2.5rem;
   width: auto;
   display: block;
   object-fit: contain;
@@ -1297,6 +1417,420 @@ footer.footer {
   word-break: break-word;
   overflow-wrap: anywhere;
 }
+
+/* ─── Nav link hover polish ─── */
+.nav-links a {
+  position: relative;
+  overflow: hidden;
+}
+.nav-links a span {
+  display: inline-block;
+  transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 4px;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: center;
+  opacity: 0;
+  transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1), opacity 200ms ease-out;
+}
+.nav-links a:hover {
+  color: var(--text-primary);
+  background: rgba(48, 67, 96, 0.4);
+}
+.nav-links a:hover span {
+  transform: translateY(-1px);
+}
+.nav-links a:hover::after {
+  transform: scaleY(2);
+  opacity: 0.8;
+}
+.nav-links a.active {
+  color: var(--accent);
+  background: rgba(62, 206, 170, 0.08);
+}
+.nav-links a.active::after {
+  transform: scaleX(1);
+  opacity: 1;
+}
+
+/* ─── Try PatchPilot button — arrow slide ─── */
+.btn-cta {
+  position: relative;
+  overflow: hidden;
+}
+.btn-cta-arrow {
+  display: inline-flex;
+  align-items: center;
+  transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  
+}
+.btn-cta:hover .btn-cta-arrow {
+  transform: translateX(3px);
+}
+.btn-cta .nav-cta-text {
+  transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-cta:hover .nav-cta-text {
+  transform: translateX(-1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-links a span,
+  .nav-links a::after,
+  .btn-cta-arrow,
+  .btn-cta .nav-cta-text {
+    transition: none;
+    transform: none !important;
+  }
+}
+
+/* Force arrow to inherit button text color, overriding hardcoded stroke in Icons.jsx */
+.btn-cta-arrow svg {
+  stroke: currentColor !important; 
+}
+
+/* ─── Rotating phrase in headline ─── */
+.rotating-phrase {
+  display: inline-block;
+  position: relative;
+  /* Reserve enough horizontal space for the longest phrase to prevent layout jump */
+  min-width: 0;
+}
+
+.rotating-phrase-inner {
+  display: inline-block;
+  background: linear-gradient(180deg, #FFFFFF 0%, #B8B8C8 110%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: phraseSwap 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* When the rotating phrase swaps, animate it in fresh each time */
+@keyframes phraseSwap {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+    filter: blur(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.rotating-phrase-inner {
+  animation: phraseSwap 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rotating-phrase-inner {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+/* ─── Step connector arrows — high specificity override ─── */
+.steps .step .step-connector {
+  position: absolute !important;
+  top: 50% !important;
+  right: -20px !important;
+  width: 36px !important;
+  height: 2px !important;
+  background: linear-gradient(90deg, var(--accent) 0%, transparent 100%) !important;
+  opacity: 0.5 !important;
+  transform: translateY(-50%) !important;
+  z-index: 10 !important;
+  pointer-events: none !important;
+  display: block !important;
+}
+
+.steps .step .step-connector::after {
+  content: '' !important;
+  position: absolute !important;
+  right: -2px !important;
+  top: 50% !important;
+  width: 8px !important;
+  height: 8px !important;
+  border-top: 2px solid var(--accent) !important;
+  border-right: 2px solid var(--accent) !important;
+  transform: translateY(-50%) rotate(45deg) !important;
+  opacity: 0.8 !important;
+  background: transparent !important;
+}
+
+.steps .step {
+  overflow: visible !important;
+}
+
+@media (max-width: 880px) {
+  .steps .step .step-connector {
+    display: none !important;
+  }
+}
+
+
+/* ─── Architecture section ─── */
+#architecture {
+  position: relative;
+}
+
+.architecture-diagram {
+  position: relative;
+  margin: 0 auto 56px;
+  max-width: 1100px;
+  padding: 32px 24px;
+  border: 1px solid var(--border-strong);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(20, 20, 30, 0.6) 0%, rgba(15, 15, 23, 0.85) 100%);
+  box-shadow:
+    0 0 0 1px rgba(52, 211, 153, 0.06),
+    0 30px 60px -20px rgba(0, 0, 0, 0.6);
+  overflow-x: auto;
+}
+
+.mermaid-wrap {
+  display: flex;
+  justify-content: center;
+  min-height: 360px;
+}
+
+.mermaid-wrap svg {
+  max-width: 100%;
+  height: auto;
+  font-family: 'Inter', sans-serif !important;
+}
+
+/* Override Mermaid's default text styles */
+.mermaid-wrap .nodeLabel {
+  color: var(--text-primary) !important;
+  font-size: 13px !important;
+  line-height: 1.4;
+}
+.mermaid-wrap .edgeLabel {
+  background: var(--bg) !important;
+  color: var(--text-tertiary) !important;
+  font-size: 11px !important;
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+/* Architecture notes (3-column technical callouts) */
+.architecture-notes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+@media (max-width: 880px) {
+  .architecture-notes { grid-template-columns: 1fr; }
+}
+
+.arch-note {
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  transition: all 250ms ease-out;
+}
+.arch-note:hover {
+  border-color: var(--border-strong);
+  background: rgba(20, 20, 30, 0.7);
+  transform: translateY(-2px);
+}
+
+.arch-note-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+
+.arch-note p {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.arch-note code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.15);
+  border-radius: 4px;
+  padding: 1px 6px;
+  color: var(--accent);
+}
+
+/* ─── Hero scroll cue ─── */
+.scroll-cue {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 56px auto 0;
+  padding: 12px 16px;
+  border-radius: 999px;
+  color: var(--text-tertiary);
+  text-decoration: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  opacity: 0;
+  animation: fadeIn 600ms ease-out 1200ms forwards;
+  transition: color 200ms ease-out, transform 200ms ease-out;
+  
+}
+
+.scroll-cue:hover {
+  color: var(--accent);
+  transform: translateY(2px);
+}
+
+.scroll-cue svg {
+  animation: scrollBounce 2.4s ease-in-out infinite;
+  animation-delay: 1800ms;
+}
+
+.scroll-cue:hover svg {
+  animation-play-state: paused;
+}
+
+@keyframes scrollBounce {
+  0%, 100% { transform: translateY(0); opacity: 0.6; }
+  50%      { transform: translateY(6px); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue,
+  .scroll-cue svg {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ─── Fix steps disclosure (smooth animation) ─── */
+.fix-steps {
+  margin-top: 4px;
+}
+
+/* Hide the default browser triangle marker */
+.fix-steps summary {
+  list-style: none;
+}
+.fix-steps summary::-webkit-details-marker {
+  display: none;
+}
+.fix-steps summary::marker {
+  display: none;
+}
+
+.fix-steps-summary {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  margin-left: -10px;
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent);
+  user-select: none;
+  transition: background 500ms ease-out;
+}
+
+.fix-steps-summary:hover {
+  background: rgba(52, 211, 153, 0.08);
+}
+
+.fix-steps-chevron {  
+  transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1);
+   flex-shrink: 0;
+}
+
+.fix-steps[open] .fix-steps-chevron {
+  transform: rotate(90deg);
+}
+
+/* Animate the list expansion */
+/* Container — smooth slide-down + fade */
+/* Container — match CodePen's slide timing */
+.fix-steps-list {
+  margin: 0;
+  padding: 0 0 0 20px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.6;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-30px);
+  transition: max-height 0.8s ease,
+              opacity 0.7s ease,
+              transform 0.9s ease,
+              margin-top 0.8s ease;
+}
+
+.fix-steps[open] .fix-steps-list {
+  max-height: 1500px;
+  opacity: 1;
+  transform: translateY(0);
+  margin-top: 14px;
+}
+
+/* Each step — slides up from below, meeting the container coming down */
+.fix-steps-list li {
+  margin-bottom: 8px;
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.7s ease,
+              transform 0.8s ease;
+}
+
+.fix-steps[open] .fix-steps-list li {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger so steps arrive sequentially, like the content sliding up */
+.fix-steps[open] .fix-steps-list li:nth-child(1) { transition-delay: 0.1s; }
+.fix-steps[open] .fix-steps-list li:nth-child(2) { transition-delay: 0.2s; }
+.fix-steps[open] .fix-steps-list li:nth-child(3) { transition-delay: 0.3s; }
+.fix-steps[open] .fix-steps-list li:nth-child(4) { transition-delay: 0.4s; }
+.fix-steps[open] .fix-steps-list li:nth-child(5) { transition-delay: 0.5s; }
+.fix-steps[open] .fix-steps-list li:nth-child(6) { transition-delay: 0.6s; }
+.fix-steps[open] .fix-steps-list li:nth-child(7) { transition-delay: 0.7s; }
+.fix-steps[open] .fix-steps-list li:nth-child(8) { transition-delay: 0.8s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fix-steps-list,
+  .fix-steps-list li {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
 /* Override the .anim-logo entrance we previously added (no longer needed) */
 .anim-logo { display: none; }
 .hero-logo { display: none; }

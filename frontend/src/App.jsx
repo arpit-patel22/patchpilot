@@ -1,7 +1,7 @@
 import React from "react";
 import { Nav, Hero } from "./components/Hero";
 import { DiagnoseSection } from "./components/DiagnoseSection";
-import { Metrics, HowItWorks, Features, KBPreview, CTABand, Footer } from "./components/Sections";
+import {  HowItWorks, Features, ArchitectureSection, KBPreview, Footer } from "./components/Sections";
 
 function CursorSpotlight() {
   const ref = React.useRef(null);
@@ -65,12 +65,13 @@ return (
     <CursorSpotlight />
     <Nav scrolled={scrolled} />
     <Hero gradient="aurora" />
+    <section id="diagnose">
     <DiagnoseSection />
-    <Metrics />
+    </section>
     <HowItWorks />
     <Features />
     <KBPreview />
-    <CTABand />
+    <ArchitectureSection />
     <Footer />
   </>
 );

@@ -16,6 +16,22 @@ const Icon = ({ children, size = 16, ...rest }) => (
   </svg>
 );
 
+export const IMail = ({ size = 18 }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.75"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="3" y="5" width="18" height="14" rx="2" />
+    <path d="M3 7l9 6 9-6" />
+  </svg>
+);
+
 export const IPlane = (p) => (
   <Icon {...p}>
     <path d="M21.5 2.5 11 13" />
@@ -122,16 +138,10 @@ export const ILinkedIn = (p) => (
     <circle cx="4" cy="4" r="2" />
   </Icon>
 );
-
-export const IMail = (p) => (
-  <Icon {...p}>
-    <rect x="3" y="5" width="18" height="14" rx="2" />
-    <path d="m3 7 9 6 9-6" />
-  </Icon>
-);
-
+    
 export const IShield = (p) => (
   <Icon {...p}>
     <path d="M12 3 4 6v6c0 5 3.5 8.5 8 9 4.5-.5 8-4 8-9V6z" />
   </Icon>
 );
+

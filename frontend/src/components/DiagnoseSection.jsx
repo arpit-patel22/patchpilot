@@ -1,6 +1,6 @@
 // PatchPilot — Real, working diagnose form wired to the backend
 import React from "react";
-import { ISparkles, ITarget, ITerminal } from "./Icons";
+import { ISparkles, ITarget } from "./Icons";
 import { diagnose } from "../api";
 
 const OS_OPTIONS = [
@@ -310,24 +310,17 @@ export const DiagnoseSection = () => {
                     {cause.explanation}
                   </div>
                 )}
-                {cause.steps && cause.steps.length > 0 && (
-                  <details style={{ marginTop: 4 }}>
-                    <summary
-                      style={{
-                        cursor: "pointer",
-                        fontSize: 12,
-                        color: "var(--accent)",
-                        fontFamily: "JetBrains Mono, monospace",
-                        letterSpacing: "0.04em",
-                        textTransform: "uppercase",
-                      }}
-                    >
-                      <ITerminal size={11} style={{ marginRight: 6, verticalAlign: "middle" }} />
-                      View {cause.steps.length} fix steps
+              {cause.steps && cause.steps.length > 0 && (
+                  <details className="fix-steps">
+                    <summary className="fix-steps-summary">
+                      <svg className="fix-steps-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M9 18l6-6-6-6" />
+                      </svg>
+                      <span>View {cause.steps.length} fix steps</span>
                     </summary>
-                    <ol style={{ margin: "10px 0 0", paddingLeft: 20, color: "var(--text-secondary)", fontSize: 13, lineHeight: 1.6 }}>
+                    <ol className="fix-steps-list">
                       {cause.steps.map((step, j) => (
-                        <li key={j} style={{ marginBottom: 4 }}>{step}</li>
+                        <li key={j}>{step}</li>
                       ))}
                     </ol>
                   </details>

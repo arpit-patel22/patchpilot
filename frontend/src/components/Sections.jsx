@@ -5,6 +5,45 @@ import {
   ILinkedIn, IMail
 } from "./Icons";
 import { InView } from "./Hero";
+import { Mermaid } from "./Mermaid";
+
+const ARCHITECTURE_CHART = `
+flowchart LR
+    User[" User<br/>(IT Technician)"]
+    React["React 19 + Vite<br/>Tailwind v4"]
+    Axios["Axios Client<br/>/api/diagnose"]
+    Controller["Spring Boot 4<br/>TroubleshootController"]
+    Validator["@Valid<br/>TroubleshootRequest"]
+    ClaudeService["ClaudeService<br/>+ RAG injection"]
+    KB[("MySQL<br/>knowledge_base")]
+    Tickets[("MySQL<br/>tickets")]
+    Claude["Anthropic API<br/>claude-sonnet-4-5"]
+
+    User -->|"types error"| React
+    React --> Axios
+    Axios -->|"POST /api/diagnose"| Controller
+    Controller --> Validator
+    Validator --> ClaudeService
+    ClaudeService -->|"fuzzy match"| KB
+    KB -.->|"context articles"| ClaudeService
+    ClaudeService -->|"prompt + RAG"| Claude
+    Claude -.->|"JSON diagnosis"| ClaudeService
+    ClaudeService -->|"persist"| Tickets
+    ClaudeService -->|"typed DTO"| Controller
+    Controller -.->|"DiagnosisResult"| React
+
+   classDef user fill:#1F1F2A,stroke:#6B6B80,stroke-width:1.5px,color:#A1A1B5
+classDef frontend fill:#0F2A1F,stroke:#34D399,stroke-width:2px,color:#FFFFFF
+classDef backend fill:#0F1F18,stroke:#34D399,stroke-width:1.5px,color:#E5E7EB
+classDef ai fill:#0A2A1F,stroke:#6EE7B7,stroke-width:2px,color:#FFFFFF
+classDef db fill:#0A1F18,stroke:#34D399,stroke-width:1px,stroke-dasharray:4 3,color:#A1A1B5
+
+    class User user
+    class React,Axios frontend
+    class Controller,Validator,ClaudeService backend
+    class Claude ai
+    class KB,Tickets db
+`;
 
 const METRICS = [
   { num: "8", unit: " KB", label: "curated articles seeded" },
@@ -78,7 +117,7 @@ const FEATURES = [
   {
     icon: <ITarget size={16} />,
     title: "Grounded diagnoses",
-    desc: "Pulls from a curated knowledge base before consulting Claude — so answers cite real KB articles, not hallucinations.",
+    desc: "Pulls from a curated knowledge base before consulting Claude - so answers cite real KB articles, not hallucinations.",
     link: "Read the RAG approach →",
   },
   {
@@ -184,29 +223,45 @@ export const KBPreview = () => (
   </section>
 );
 
-export const CTABand = () => (
-  <section style={{ paddingTop: 32 }}>
+export const ArchitectureSection = () => (
+  <section id="architecture">
     <div className="container">
-      <InView className="cta-band">
-        <span className="eyebrow">/ get started</span>
-        <h2>Stop debugging install errors alone.</h2>
-        <p>Let PatchPilot do the diagnostic work — so your queue clears and your evenings come back.</p>
-        <div className="hero-ctas">
-          <a className="btn btn-primary btn-large" href="#">
-            Try PatchPilot free
-            <IArrowRight size={15} />
-          </a>
-          <a className="btn btn-secondary btn-large" href="#">
-            <IGithub size={14} />
-            Star on GitHub
-          </a>
+      <InView className="section-head center">
+        <span className="eyebrow">/ ARCHITECTURE</span>
+        <h2 className="section-title">How a diagnosis flows through PatchPilot</h2>
+        <p className="section-sub">
+          From plain-English error to ranked causes in one round trip - here's what happens in between.
+        </p>
+      </InView>
+
+      <InView className="architecture-diagram">
+        <Mermaid chart={ARCHITECTURE_CHART} />
+      </InView>
+
+      <InView className="architecture-notes">
+        <div className="arch-note">
+          <div className="arch-note-label">RAG GROUNDING</div>
+          <p>
+            Before calling Claude, the backend fuzzy-matches the user's error against the seeded knowledge base
+            and injects relevant articles into the prompt. Claude reasons over real engineering data instead of
+            hallucinating from training memory.
+          </p>
         </div>
-        <div className="hero-meta" style={{ marginTop: 24 }}>
-          <span>No card required</span>
-          <span className="pip" />
-          <span>Self-host in 5 minutes</span>
-          <span className="pip" />
-          <span>MIT licensed</span>
+        <div className="arch-note">
+          <div className="arch-note-label">TYPED DTOs AT BOUNDARY</div>
+          <p>
+            Diagnosis is stored as raw JSON in a TEXT column for single-document access - but parsed into
+            <code> DiagnosisResult</code> and <code>CauseDetail</code> DTOs at the API boundary so the frontend
+            consumes type-safe data, not strings.
+          </p>
+        </div>
+        <div className="arch-note">
+          <div className="arch-note-label">SPRING BOOT 4 QUIRK</div>
+          <p>
+            <code>spring-boot-starter-webmvc</code> doesn't auto-configure the Jackson <code>ObjectMapper</code>
+            the way 3.x's <code>spring-boot-starter-web</code> did. Explicitly registered as a bean -
+            interview-defensible call I'd otherwise have spent an hour debugging.
+          </p>
         </div>
       </InView>
     </div>
@@ -217,24 +272,40 @@ export const Footer = () => (
   <footer className="footer">
     <div className="container">
       <div className="footer-row">
-      <div className="footer-brand">
-          <div className="row1">
-            <img src="/logo-full.png" alt="PatchPilot" className="footer-logo-img" />
-          </div>
-          <div>Built by Arpit Patel · Computer Programming, Humber College</div>
-          <div className="mono" style={{ fontSize: 11, color: "var(--text-tertiary)", marginTop: 4 }}>
-            © 2026 · v0.4.2 · last deploy 6h ago
-          </div>
+        <div className="footer-brand">
+          <img src="/logo-full.png" alt="PatchPilot" className="footer-logo-img" />
+          <p className="footer-tagline">
+            AI-powered diagnostics for installation failures.
+          </p>
         </div>
-        <div className="footer-links">
-          <a href="#"><IGithub size={14} />GitHub</a>
-          <a href="#"><ILinkedIn size={14} />LinkedIn</a>
-          <a href="#"><IMail size={14} />Email</a>
+
+        <div className="footer-cols">
+          <div className="footer-col">
+            <div className="footer-col-title">Connect</div>
+            <a href="#" target="_blank" rel="noopener noreferrer">
+              <IGithub size={13} /> GitHub
+            </a>
+            <a href="#" target="_blank" rel="noopener noreferrer">
+              <ILinkedIn size={13} /> LinkedIn
+            </a>
+            <a href="mailto:YOUR_EMAIL_HERE">
+              <IMail size={13} /> Email
+            </a>
+          </div>
+
+          <div className="footer-col">
+            <div className="footer-col-title">Built with</div>
+            <span>Anthropic Claude</span>
+            <span>Spring Boot 4 · Java 21</span>
+            <span>React 19 · Vite</span>
+            <span>MySQL · JPA</span>
+          </div>
         </div>
       </div>
+
       <div className="footer-fine">
-        <span>Powered by Anthropic Claude · Spring Boot · React · MySQL</span>
-        <span>Made in Toronto</span>
+        <span>© 2026 PatchPilot · Built by Arpit Patel</span>
+        <span className="mono">Made in Toronto, Canada</span>
       </div>
     </div>
   </footer>
