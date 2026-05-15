@@ -21,7 +21,10 @@ public class ClaudeService {
 
     private static final String CLAUDE_API_URL = "https://api.anthropic.com/v1/messages";
     private static final String MODEL = "claude-sonnet-4-5";
-    private static final int MAX_TOKENS = 2000;
+
+    // Lowered from 2000 -> 1200 as a hard safety ceiling.
+    // Expected output is ~1000 tokens after the trim; 1200 leaves margin.
+    private static final int MAX_TOKENS = 1200;
 
     private static final String SYSTEM_PROMPT = """
             You are PatchPilot, a senior IT support engineer specializing in diagnosing \
@@ -31,22 +34,27 @@ public class ClaudeService {
 
             Required structure (return exactly this, no extra keys):
             {
-              "tryThisFirst": "string — the single best first action the user should take right now",
+              "tryThisFirst": "string — one concrete first action, max 15 words",
               "causes": [
                 {
-                  "name": "string — short name for this cause",
+                  "name": "string — short name for this cause, max 6 words",
                   "probability": <integer 0-100>,
-                  "explanation": "string — plain English, 1-2 sentences",
-                  "steps": ["string", "string", ...]
+                  "explanation": "string — ONE sentence, max 20 words",
+                  "steps": ["string", "string", "string"]
                 }
               ]
             }
 
-            Rules:
-            - Always return exactly 3 causes, ranked by probability descending.
+            Strict output rules — follow exactly:
+            - Return EXACTLY 3 causes, ranked by probability descending.
             - Probabilities need not sum to 100; each represents independent likelihood.
-            - Each cause must include at least 2 concrete, actionable steps.
+            - Each cause must have EXACTLY 3 steps — no more, no less.
+            - Each step must be ONE action-oriented sentence, max 15 words.
+            - Each step must start with a verb (e.g., "Run", "Open", "Delete", "Verify").
+            - Each "explanation" must be ONE sentence only — no compound sentences, no semicolons.
+            - "tryThisFirst" must be a single concrete action — not a list, not a paragraph.
             - Never wrap the JSON in markdown code fences or add any text outside it.
+            - Be specific and concise. Recruiters and IT pros will read this — avoid filler words like "you should", "it is recommended", "try to".
             """;
 
     private final RestClient restClient;

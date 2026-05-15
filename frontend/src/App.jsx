@@ -1,6 +1,7 @@
 import React from "react";
 import { Nav, Hero } from "./components/Hero";
 import { DiagnoseSection } from "./components/DiagnoseSection";
+import ScrollToTop from "./components/ScrollToTop";
 import {  HowItWorks, Features, ArchitectureSection, KBPreview, Footer } from "./components/Sections";
 
 function CursorSpotlight() {
@@ -72,6 +73,7 @@ return (
     <Features />
     <KBPreview />
     <ArchitectureSection />
+    <ScrollToTop />
     <Footer />
   </>
 );

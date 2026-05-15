@@ -194,10 +194,11 @@ export const Hero = ({ gradient }) =>
         <span>8 KB articles seeded</span>
         <span className="pip" />
         <span>Open source</span>
+         <span className="pip" />
       </div>
 
       <a href="#diagnose" className="scroll-cue" aria-label="Scroll to diagnose form">
-        <span className="scroll-cue-text">Try it below</span>
+        <span className="scroll-cue-text"> Try it below</span>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M12 5v14" />
           <path d="M19 12l-7 7-7-7" />

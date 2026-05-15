@@ -675,6 +675,8 @@ h1.hero-title .accent-word {
   display: inline-block;
 }
 
+
+
 /* ─── Section base ─── */
 section {
   position: relative;
@@ -1828,6 +1830,76 @@ footer.footer {
   .fix-steps-list li {
     transition: none !important;
     transform: none !important;
+  }
+}
+
+/* ============================================
+   Scroll-to-top button
+   ============================================ */
+.scroll-to-top {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 50;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+
+  background: #10b981; /* emerald-500 — matches your theme */
+  color: #0a0a0a;      /* near-black arrow for contrast */
+  border: 1px solid rgba(16, 185, 129, 0.6);
+  border-radius: 9999px;
+
+  cursor: pointer;
+  box-shadow:
+    0 4px 14px rgba(16, 185, 129, 0.35),
+    0 2px 6px rgba(0, 0, 0, 0.4);
+
+  /* Hidden by default — fades + lifts in when visible */
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+  transition:
+    opacity 220ms ease-out,
+    transform 220ms ease-out,
+    box-shadow 180ms ease-out,
+    background-color 180ms ease-out;
+}
+
+.scroll-to-top--visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.scroll-to-top:hover {
+  background: #34d399; /* emerald-400 — slightly brighter on hover */
+  box-shadow:
+    0 6px 20px rgba(16, 185, 129, 0.5),
+    0 3px 8px rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
+}
+
+.scroll-to-top:active {
+  transform: translateY(0);
+}
+
+.scroll-to-top:focus-visible {
+  outline: 2px solid #34d399;
+  outline-offset: 3px;
+}
+
+/* Tuck slightly higher on small screens so it doesn't crowd thumbs */
+@media (max-width: 640px) {
+  .scroll-to-top {
+    bottom: 1rem;
+    right: 1rem;
+    width: 44px;
+    height: 44px;
   }
 }
 
