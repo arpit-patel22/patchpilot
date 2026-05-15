@@ -1,2 +1,5 @@
 
 .env
+
+# Claude Code worktrees (internal sandbox, not part of project)
+.claude/
