@@ -11,6 +11,10 @@ import ai.patchpilot.api.repository.TroubleshootingTicketRepository;
 import ai.patchpilot.api.service.ClaudeService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -94,19 +98,18 @@ public class TroubleshootController {
                 .build());
     }
 
-    /**
-     * Returns all troubleshooting tickets ordered newest first.
-     * <p>Parses the stored JSON diagnosis into a typed {@link DiagnosisResult}
-     * at the API boundary so consumers get the same shape as /diagnose.</p>
-     */
     @GetMapping("/tickets")
-    public ResponseEntity<List<TicketSummary>> getTickets() {
+    public Page<TicketSummary> listTickets(
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
         long startedAt = System.currentTimeMillis();
-        List<TicketSummary> summaries = ticketRepo.findAllByOrderByCreatedAtDesc().stream()
-                .map(this::toSummary)
-                .toList();
-        log.debug("Returned {} tickets in {}ms", summaries.size(), System.currentTimeMillis() - startedAt);
-        return ResponseEntity.ok(summaries);
+        Page<TroubleshootingTicket> tickets = ticketRepo.findAll(pageable);
+        Page<TicketSummary> result = tickets.map(this::toSummary);
+        long durationMs = System.currentTimeMillis() - startedAt;
+        log.info("GET /api/tickets page={} size={} returned {} of {} total in {}ms",
+                pageable.getPageNumber(), pageable.getPageSize(),
+                tickets.getNumberOfElements(), tickets.getTotalElements(), durationMs);
+        return result;
     }
 
     /**

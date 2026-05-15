@@ -9,4 +9,6 @@ public interface KnowledgeBaseArticleRepository extends JpaRepository<KnowledgeB
 
     List<KnowledgeBaseArticle> findBySoftwareContainingIgnoreCaseOrErrorPatternContainingIgnoreCase(
             String software, String errorPattern);
+
+    List<KnowledgeBaseArticle> findByCategoryOrderByIdAsc(KnowledgeBaseArticle.Category category);
 }
