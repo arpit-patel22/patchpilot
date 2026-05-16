@@ -1,4 +1,5 @@
 // PatchPilot — Metrics, How it works, Features, KB, CTA, Footer
+import { useState, useEffect } from "react";
 import {
   IPencil, ISparkles, ICheck, ITarget,
   IBars, IDatabase, IArrowRight, IGithub,
@@ -6,6 +7,7 @@ import {
 } from "./Icons";
 import { InView } from "./Hero";
 import { Mermaid } from "./Mermaid";
+import { getKbArticles } from "../api";
 
 const ARCHITECTURE_CHART = `
 flowchart LR
@@ -158,70 +160,84 @@ export const Features = () => (
   </section>
 );
 
-const KB_ARTICLES = [
-  {
-    cat: "windows",
-    catLabel: "Windows",
-    title: "Resolving MSI Error 1603 during silent installs",
-    desc: "Clean the installer cache, reset TrustedInstaller, and re-run with verbose logging.",
-    id: "KB-0124",
-  },
-  {
-    cat: "macos",
-    catLabel: "macOS",
-    title: "Gatekeeper blocking signed packages on 14.4+",
-    desc: "Re-staple notarization tickets and verify the developer ID chain with spctl.",
-    id: "KB-0089",
-  },
-  {
-    cat: "linux",
-    catLabel: "Linux",
-    title: "apt: held broken packages on Ubuntu 24.04 LTS",
-    desc: "Identify dependency conflicts with aptitude and selectively downgrade the offending lib.",
-    id: "KB-0151",
-  },
-  {
-    cat: "network",
-    catLabel: "Network",
-    title: "Corporate proxy intercepting NPM cert chain",
-    desc: "Trust the MITM root cert, set strict-ssl, and configure registry fallback.",
-    id: "KB-0203",
-  },
-];
+function formatCategory(cat) {
+  if (!cat) return "";
+  return cat.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+}
 
-export const KBPreview = () => (
-  <section id="kb" style={{ paddingTop: 32 }}>
-    <div className="container">
-      <div className="section-head" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 16 }}>
-        <div>
-          <span className="eyebrow">/ knowledge base</span>
-          <h2 className="section-title">Eight articles. Real fixes. Always growing.</h2>
-          <p className="section-sub">
-            Hand-curated from the install errors that actually show up in tickets — not
-            scraped from random forum threads.
-          </p>
-        </div>
-        <a className="btn btn-secondary" href="#">
-          Browse all articles
-          <IArrowRight size={14} />
-        </a>
-      </div>
-      <div className="kb-row">
-        {KB_ARTICLES.map((a) => (
-          <a key={a.id} href="#" className="kb">
-            <span className={"kb-cat " + a.cat}>{a.catLabel}</span>
-            <h4>{a.title}</h4>
-            <p>{a.desc}</p>
-            <div className="kb-foot">
-              <span>{a.id}</span>
-              <span className="arrow">View →</span>
-            </div>
+function categoryClass(cat) {
+  if (!cat) return "";
+  return cat.toLowerCase().replace(/_/g, "-");
+}
+
+function kbId(id) {
+  return "KB-" + String(id).padStart(4, "0");
+}
+
+export const KBPreview = () => {
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getKbArticles({ limit: 8 }).then((data) => {
+      setArticles(data);
+      setLoading(false);
+    });
+  }, []);
+
+  return (
+    <section id="kb" style={{ paddingTop: 32 }}>
+      <div className="container">
+        <div className="section-head" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 16 }}>
+          <div>
+            <span className="eyebrow">/ knowledge base</span>
+            <h2 className="section-title">Eight articles. Real fixes. Always growing.</h2>
+            <p className="section-sub">
+              Hand-curated from the install errors that actually show up in tickets — not
+              scraped from random forum threads.
+            </p>
+          </div>
+          <a className="btn btn-secondary" href="#">
+            Browse all articles
+            <IArrowRight size={14} />
           </a>
-        ))}
+        </div>
+
+        {loading ? (
+          <div className="kb-row">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="kb" style={{ cursor: "default" }}>
+                <div style={{ width: 72, height: 20, borderRadius: 4, background: "var(--border)", marginBottom: 12, animation: "pulse 1.5s ease-in-out infinite" }} />
+                <div style={{ height: 16, borderRadius: 4, background: "var(--border)", marginBottom: 8, animation: "pulse 1.5s ease-in-out infinite" }} />
+                <div style={{ height: 16, borderRadius: 4, background: "var(--border)", width: "80%", marginBottom: 8, animation: "pulse 1.5s ease-in-out infinite" }} />
+                <div style={{ height: 14, borderRadius: 4, background: "var(--border)", width: "65%", marginBottom: 16, animation: "pulse 1.5s ease-in-out infinite" }} />
+                <div style={{ height: 14, borderRadius: 4, background: "var(--border)", width: "40%", marginTop: "auto", animation: "pulse 1.5s ease-in-out infinite" }} />
+              </div>
+            ))}
+          </div>
+        ) : articles.length === 0 ? (
+          <p style={{ color: "var(--text-tertiary)", textAlign: "center", padding: "48px 0" }}>
+            No knowledge base articles available yet.
+          </p>
+        ) : (
+          <div className="kb-row">
+            {articles.map((a) => (
+              <a key={a.id} href="#" className="kb">
+                <span className={"kb-cat " + categoryClass(a.category)}>{formatCategory(a.category)}</span>
+                <h4>{a.title}</h4>
+                <p>{a.snippet}</p>
+                <div className="kb-foot">
+                  <span>{kbId(a.id)}</span>
+                  <span className="arrow">View →</span>
+                </div>
+              </a>
+            ))}
+          </div>
+        )}
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 export const ArchitectureSection = () => (
   <section id="architecture">

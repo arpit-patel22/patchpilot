@@ -1,14 +1,10 @@
 // API client for PatchPilot backend
 import axios from "axios";
 
-// Base URL — points to local Spring Boot backend during dev
-// In production, this would be set via environment variable
-const API_BASE = "http://localhost:8080/api";
-
 // Create a configured axios instance
 const apiClient = axios.create({
-  baseURL: API_BASE,
-  timeout: 30000, // 30s — Claude API calls can be slow
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api",
+  timeout: 60000, // 60s — Render free tier cold starts take ~30s
   headers: {
     "Content-Type": "application/json",
   },
@@ -39,6 +35,26 @@ export async function diagnose(request) {
 export async function getTickets() {
   const response = await apiClient.get("/tickets");
   return response.data;
+}
+
+/**
+ * GET /api/kb
+ * Returns knowledge base article summaries.
+ * @param {Object} [opts]
+ * @param {string} [opts.category] - Filter by category (e.g. "CORRUPTION")
+ * @param {number} [opts.limit=8]  - Max results (1–50)
+ */
+export async function getKbArticles({ category, limit = 8 } = {}) {
+  try {
+    const params = {};
+    if (category) params.category = category;
+    if (limit) params.limit = limit;
+    const { data } = await apiClient.get("/kb", { params });
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch KB articles:", error);
+    return [];
+  }
 }
 
 /**

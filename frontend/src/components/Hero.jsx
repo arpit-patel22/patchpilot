@@ -221,6 +221,8 @@ with installer service.
 
 [18:44:02] Action ended 18:44:02: InstallFinalize. Return value 3.`;
 
+// TODO: These are static product-preview mockup entries — KB IDs are fake.
+// The real KB section (KBPreview in Sections.jsx) fetches live data from /api/kb.
 const DIAGNOSES = [
   { rank: "01", primary: true, title: "Stale MSI installer cache blocking re-registration", prob: 87, meta: ["KB-0124", "Windows 11", "fixes: 4"] },
   { rank: "02", title: "Insufficient TrustedInstaller permissions on %ProgramData%", prob: 41, meta: ["KB-0089", "Permissions", "fixes: 2"] },
