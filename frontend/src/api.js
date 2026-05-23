@@ -65,3 +65,25 @@ export async function getHealth() {
   const response = await apiClient.get("/health");
   return response.data;
 }
+
+/**
+ * GET /api/kb/{id}
+ * Returns full detail for a single knowledge base article.
+ *
+ * @param {number} id - Article ID
+ * @returns {Promise<Object|null>} Article detail (id, title, software, osTarget,
+ *   category, rootCause, resolutionSteps, createdAt), or null if not found.
+ */
+export async function getKbArticle(id) {
+  try {
+    const { data } = await apiClient.get(`/kb/${id}`);
+    return data;
+  } catch (error) {
+    if (error.response?.status === 404) {
+      console.warn(`KB article ${id} not found`);
+      return null;
+    }
+    console.error(`Failed to fetch KB article ${id}:`, error);
+    throw error;
+  }
+}

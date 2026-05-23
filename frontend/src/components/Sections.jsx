@@ -7,7 +7,9 @@ import {
 } from "./Icons";
 import { InView } from "./Hero";
 import { Mermaid } from "./Mermaid";
-import { getKbArticles } from "../api";
+import { getKbArticles, getKbArticle } from "../api";
+import KbArticleModal from "./KbArticleModal";
+
 
 const ARCHITECTURE_CHART = `
 flowchart LR
@@ -185,6 +187,29 @@ export const KBPreview = () => {
     });
   }, []);
 
+  const [openArticle, setOpenArticle] = useState(null);
+  const [modalLoading, setModalLoading] = useState(false);
+  const [modalError, setModalError] = useState(null);
+
+  async function handleOpenArticle(id) {
+    setOpenArticle({});
+    setModalLoading(true);
+    setModalError(null);
+    try {
+      const data = await getKbArticle(id);
+      setOpenArticle(data);
+    } catch (err) {
+      setModalError(err);
+    } finally {
+      setModalLoading(false);
+    }
+  }
+
+  function handleCloseModal() {
+    setOpenArticle(null);
+    setModalError(null);
+  }
+
   return (
     <section id="kb" style={{ paddingTop: 32 }}>
       <div className="container">
@@ -222,7 +247,7 @@ export const KBPreview = () => {
         ) : (
           <div className="kb-row">
             {articles.map((a) => (
-              <a key={a.id} href="#" className="kb">
+              <button key={a.id} type="button" className="kb" onClick={() => handleOpenArticle(a.id)}>
                 <span className={"kb-cat " + categoryClass(a.category)}>{formatCategory(a.category)}</span>
                 <h4>{a.title}</h4>
                 <p>{a.snippet}</p>
@@ -230,11 +255,19 @@ export const KBPreview = () => {
                   <span>{kbId(a.id)}</span>
                   <span className="arrow">View →</span>
                 </div>
-              </a>
+              </button>
             ))}
           </div>
         )}
       </div>
+      {openArticle !== null && (
+        <KbArticleModal
+          article={modalLoading ? null : openArticle}
+          loading={modalLoading}
+          error={modalError}
+          onClose={handleCloseModal}
+        />
+      )}
     </section>
   );
 };

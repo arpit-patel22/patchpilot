@@ -2016,6 +2016,247 @@ footer.footer {
   }
 }
 
+
+/* ===== KB Article Modal ============================================ */
+
+.kb-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 5vh 4vw;
+
+  background: rgba(8, 12, 14, 0.97);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  animation: mermaidFadeIn 200ms ease-out;
+  overflow-y: auto;
+}
+
+.kb-modal-close {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 101;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  border-radius: 9999px;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease-out,
+    border-color 160ms ease-out,
+    transform 160ms ease-out;
+}
+
+.kb-modal-close:hover {
+  background: rgba(52, 211, 153, 0.25);
+  border-color: rgba(52, 211, 153, 0.7);
+  transform: scale(1.05);
+}
+
+.kb-modal-close:active {
+  transform: scale(0.97);
+}
+
+.kb-modal-close:focus-visible {
+  outline: 2px solid #34d399;
+  outline-offset: 3px;
+}
+
+.kb-modal-content {
+  width: 100%;
+  max-width: 760px;
+  background: rgba(15, 15, 23, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 2.5rem 2.5rem 3rem;
+  color: #e5e7eb;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+}
+
+/* --- State views (loading / error / not found) --- */
+
+.kb-modal-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 3rem 1rem;
+  text-align: center;
+  color: #9ca3af;
+}
+
+.kb-modal-spinner {
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  border: 3px solid rgba(52, 211, 153, 0.2);
+  border-top-color: #34d399;
+  animation: kbSpin 700ms linear infinite;
+}
+
+@keyframes kbSpin {
+  to { transform: rotate(360deg); }
+}
+
+.kb-modal-error-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #f3f4f6;
+}
+
+.kb-modal-error-body {
+  font-size: 0.95rem;
+  color: #9ca3af;
+}
+
+/* --- Article body --- */
+
+.kb-modal-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.kb-modal-badge {
+  display: inline-block;
+  width: fit-content;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 9999px;
+  background: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.kb-modal-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #f9fafb;
+  margin: 0;
+}
+
+.kb-modal-meta {
+  font-size: 0.9rem;
+  color: #9ca3af;
+  margin: 0;
+}
+
+.kb-modal-section + .kb-modal-section {
+  margin-top: 2rem;
+}
+
+.kb-modal-section-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #34d399;
+  margin: 0 0 0.75rem;
+}
+
+.kb-modal-prose {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #d1d5db;
+  margin: 0;
+}
+
+/* --- Markdown rendering --- */
+
+.kb-modal-markdown {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #d1d5db;
+}
+
+.kb-modal-markdown p {
+  margin: 0 0 1rem;
+}
+
+.kb-modal-markdown ol,
+.kb-modal-markdown ul {
+  margin: 0 0 1rem;
+  padding-left: 1.5rem;
+}
+
+.kb-modal-markdown li {
+  margin-bottom: 0.5rem;
+}
+
+.kb-modal-markdown strong {
+  color: #f3f4f6;
+  font-weight: 600;
+}
+
+.kb-modal-markdown code {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.9em;
+  color: #6ee7b7;
+}
+
+.kb-modal-markdown pre {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.kb-modal-markdown pre code {
+  background: transparent;
+  padding: 0;
+  color: #e5e7eb;
+}
+
+.kb-modal-markdown a {
+  color: #60a5fa;
+  text-decoration: underline;
+}
+
+/* --- Mobile --- */
+
+@media (max-width: 640px) {
+  .kb-modal-backdrop {
+    padding: 3vh 3vw;
+  }
+  .kb-modal-close {
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 40px;
+    height: 40px;
+  }
+  .kb-modal-content {
+    padding: 1.75rem 1.5rem 2rem;
+  }
+  .kb-modal-title {
+    font-size: 1.4rem;
+  }
+}
+
 /* Override the .anim-logo entrance we previously added (no longer needed) */
 .anim-logo { display: none; }
 .hero-logo { display: none; }
