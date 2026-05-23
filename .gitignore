@@ -3,3 +3,8 @@
 
 # Claude Code worktrees (internal sandbox, not part of project)
 .claude/
+
+# Root-level node_modules and package files (frontend has its own)
+/node_modules/
+/package.json
+/package-lock.json
