@@ -1,5 +1,6 @@
 package ai.patchpilot.api.controller;
 
+import ai.patchpilot.api.dto.KbArticleDetail;
 import ai.patchpilot.api.dto.KbArticleSummary;
 import ai.patchpilot.api.model.KnowledgeBaseArticle;
 import ai.patchpilot.api.repository.KnowledgeBaseArticleRepository;
@@ -7,7 +8,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,6 +56,27 @@ public class KbController {
                 category, clampedLimit, results.size(), System.currentTimeMillis() - startedAt);
 
         return results;
+    }
+
+    /**
+     * Returns the full content of a single KB article for the detail modal.
+     * 200 with the article if found, 404 if no article matches the id.
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<KbArticleDetail> getArticle(@PathVariable Long id) {
+        long startedAt = System.currentTimeMillis();
+
+        return kbRepo.findById(id)
+                .map(article -> {
+                    log.info("GET /api/kb/{} returned article '{}' in {}ms",
+                            id, article.getTitle(), System.currentTimeMillis() - startedAt);
+                    return ResponseEntity.ok(KbArticleDetail.from(article));
+                })
+                .orElseGet(() -> {
+                    log.info("GET /api/kb/{} not found in {}ms",
+                            id, System.currentTimeMillis() - startedAt);
+                    return ResponseEntity.notFound().build();
+                });
     }
 
     private KnowledgeBaseArticle.Category parseCategory(String value) {

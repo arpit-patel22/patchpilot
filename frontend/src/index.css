@@ -1903,6 +1903,119 @@ footer.footer {
   }
 }
 
+
+/* ============================================
+   Mermaid clickable diagram + modal
+   ============================================ */
+.mermaid-clickable {
+  cursor: zoom-in;
+  transition: opacity 180ms ease-out;
+  outline: none;
+}
+
+.mermaid-clickable:hover {
+  opacity: 0.9;
+}
+
+.mermaid-clickable:focus-visible {
+  outline: 2px solid #34d399;
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.mermaid-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;          /* was 100 — bump higher to beat any other stacking */
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5vh 4vw;
+  
+  background: rgba(8, 12, 14, 0.97);    /* was 0.92 — more opaque */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  
+  animation: mermaidFadeIn 200ms ease-out;
+}
+
+@keyframes mermaidFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.mermaid-modal-content {
+  width: 100%;
+  max-width: 1600px;
+  max-height: 90vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: auto;
+}
+
+.mermaid-modal-content svg {
+  width: 100%;
+  height: auto;
+  max-width: none;
+  max-height: 90vh;
+}
+
+.mermaid-modal-close {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 101;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  border-radius: 9999px;
+  cursor: pointer;
+
+  transition:
+    background-color 160ms ease-out,
+    border-color 160ms ease-out,
+    transform 160ms ease-out;
+}
+
+.mermaid-modal-close:hover {
+  background: rgba(52, 211, 153, 0.25);
+  border-color: rgba(52, 211, 153, 0.7);
+  transform: scale(1.05);
+}
+
+.mermaid-modal-close:active {
+  transform: scale(0.97);
+}
+
+.mermaid-modal-close:focus-visible {
+  outline: 2px solid #34d399;
+  outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .mermaid-modal-backdrop {
+    padding: 4vh 3vw;
+  }
+  .mermaid-modal-close {
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 40px;
+    height: 40px;
+  }
+}
+
 /* Override the .anim-logo entrance we previously added (no longer needed) */
 .anim-logo { display: none; }
 .hero-logo { display: none; }
