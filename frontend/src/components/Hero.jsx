@@ -179,7 +179,7 @@ export const Hero = ({ gradient }) =>
 
       <div className="hero-ctas anim-ctas">
         <a className="btn btn-primary btn-large btn-cta" href="#diagnose">
-          <span className="nav-cta-text">Try it free</span>
+          <span>Try it free</span>
           <span className="btn-cta-arrow">
             <IArrowRight size={15} />
           </span>

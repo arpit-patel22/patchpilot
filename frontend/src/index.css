@@ -1212,7 +1212,14 @@ textarea.field-input {
 .kb-cat.windows { color: #60A5FA; border-color: rgba(96, 165, 250, 0.25); }
 .kb-cat.macos   { color: #C4B5FD; border-color: rgba(196, 181, 253, 0.25); }
 .kb-cat.linux   { color: #FCD34D; border-color: rgba(252, 211, 77, 0.25); }
-.kb-cat.network { color: #6EE7B7; border-color: rgba(110, 231, 183, 0.25); }
+.kb-cat.corruption { background: rgba(239, 68,  68,  0.15); color: #f87171; border-color: rgba(239, 68,  68,  0.35); }
+.kb-cat.dependency { background: rgba(59,  130, 246, 0.15); color: #60a5fa; border-color: rgba(59,  130, 246, 0.35); }
+.kb-cat.antivirus  { background: rgba(249, 115, 22,  0.15); color: #fb923c; border-color: rgba(249, 115, 22,  0.35); }
+.kb-cat.disk-space { background: rgba(234, 179, 8,   0.15); color: #facc15; border-color: rgba(234, 179, 8,   0.35); }
+.kb-cat.permission { background: rgba(168, 85,  247, 0.15); color: #c084fc; border-color: rgba(168, 85,  247, 0.35); }
+.kb-cat.registry   { background: rgba(6,   182, 212, 0.15); color: #22d3ee; border-color: rgba(6,   182, 212, 0.35); }
+.kb-cat.network    { background: rgba(20,  184, 166, 0.15); color: #2dd4bf; border-color: rgba(20,  184, 166, 0.35); }
+.kb-cat.other      { background: rgba(107, 114, 128, 0.15); color: #9ca3af; border-color: rgba(107, 114, 128, 0.35); }
 .kb h4 {
   font-size: 15px;
   font-weight: 600;
@@ -2083,6 +2090,7 @@ footer.footer {
   padding: 2.5rem 2.5rem 3rem;
   color: #e5e7eb;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  overflow-x: hidden;
 }
 
 /* --- State views (loading / error / not found) --- */
@@ -2146,6 +2154,14 @@ footer.footer {
   color: #34d399;
   border: 1px solid rgba(52, 211, 153, 0.3);
 }
+.kb-modal-badge.kb-badge-corruption { background: rgba(239, 68,  68,  0.15); color: #f87171; border-color: rgba(239, 68,  68,  0.35); }
+.kb-modal-badge.kb-badge-dependency { background: rgba(59,  130, 246, 0.15); color: #60a5fa; border-color: rgba(59,  130, 246, 0.35); }
+.kb-modal-badge.kb-badge-antivirus  { background: rgba(249, 115, 22,  0.15); color: #fb923c; border-color: rgba(249, 115, 22,  0.35); }
+.kb-modal-badge.kb-badge-disk_space { background: rgba(234, 179, 8,   0.15); color: #facc15; border-color: rgba(234, 179, 8,   0.35); }
+.kb-modal-badge.kb-badge-permission { background: rgba(168, 85,  247, 0.15); color: #c084fc; border-color: rgba(168, 85,  247, 0.35); }
+.kb-modal-badge.kb-badge-registry   { background: rgba(6,   182, 212, 0.15); color: #22d3ee; border-color: rgba(6,   182, 212, 0.35); }
+.kb-modal-badge.kb-badge-network    { background: rgba(20,  184, 166, 0.15); color: #2dd4bf; border-color: rgba(20,  184, 166, 0.35); }
+.kb-modal-badge.kb-badge-other      { background: rgba(107, 114, 128, 0.15); color: #9ca3af; border-color: rgba(107, 114, 128, 0.35); }
 
 .kb-modal-title {
   font-size: 1.75rem;
@@ -2215,6 +2231,8 @@ footer.footer {
   font-family: "JetBrains Mono", ui-monospace, monospace;
   font-size: 0.9em;
   color: #6ee7b7;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .kb-modal-markdown pre {
@@ -2250,10 +2268,16 @@ footer.footer {
     height: 40px;
   }
   .kb-modal-content {
-    padding: 1.75rem 1.5rem 2rem;
+    padding: 3.5rem 1.5rem 2rem;
   }
   .kb-modal-title {
     font-size: 1.4rem;
+  }
+  .kb-modal-markdown {
+    font-size: 0.95rem;
+  }
+  .kb-modal-markdown pre {
+    padding: 0.75rem;
   }
 }
 

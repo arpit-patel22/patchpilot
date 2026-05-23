@@ -222,10 +222,6 @@ export const KBPreview = () => {
               scraped from random forum threads.
             </p>
           </div>
-          <a className="btn btn-secondary" href="#">
-            Browse all articles
-            <IArrowRight size={14} />
-          </a>
         </div>
 
         {loading ? (
@@ -343,11 +339,10 @@ export const Footer = () => (
           </div>
 
           <div className="footer-col">
-            <div className="footer-col-title">Built with</div>
-            <span>Anthropic Claude</span>
-            <span>Spring Boot 4 · Java 21</span>
-            <span>React 19 · Vite</span>
-            <span>MySQL · JPA</span>
+            <div className="footer-col-title">Project</div>
+            <a href="#how">How it works</a>
+            <a href="#kb">Knowledge base</a>
+            <a href="#diagnose">Try it free</a>
           </div>
         </div>
       </div>
