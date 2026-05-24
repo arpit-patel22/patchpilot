@@ -4,6 +4,43 @@
 
 /* PatchPilot — landing page styles */
 
+/* ===== Custom scrollbar — green theme ============================== */
+
+/* Webkit (Chrome, Edge, Safari, Brave) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 15, 23, 0.6);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(52, 211, 153, 0.35);
+  border-radius: 9999px;
+  border: 2px solid rgba(15, 15, 23, 0.6);
+  transition: background 160ms ease-out;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(52, 211, 153, 0.55);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: #34d399;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(52, 211, 153, 0.4) rgba(15, 15, 23, 0.6);
+}
+
 
 :root {
   --bg: #0A0A0F;
@@ -1162,6 +1199,7 @@ textarea.field-input {
   text-decoration: none;
   opacity: 0.85;
   transition: opacity 200ms;
+  cursor: pointer;
 }
 .feature:hover .feature-link { opacity: 1; }
 
@@ -1364,7 +1402,7 @@ footer.footer {
   font-size: 12px;
   color: var(--text-tertiary);
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   gap: 16px;
   flex-wrap: wrap;
   letter-spacing: 0.01em;
@@ -2036,7 +2074,7 @@ footer.footer {
   justify-content: center;
   padding: 5vh 4vw;
 
-  background: rgba(8, 12, 14, 0.97);
+  background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 
@@ -2262,13 +2300,17 @@ footer.footer {
     padding: 3vh 3vw;
   }
   .kb-modal-close {
-    top: 0.75rem;
-    right: 0.75rem;
-    width: 40px;
-    height: 40px;
+    position: absolute;
+    top: 0.875rem;
+    right: 0.875rem;
+    width: 36px;
+    height: 36px;
+    z-index: 10;
   }
   .kb-modal-content {
-    padding: 3.5rem 1.5rem 2rem;
+    position: relative;
+    overflow: visible;
+    padding: 3rem 1.5rem 2rem;
   }
   .kb-modal-title {
     font-size: 1.4rem;
@@ -2302,3 +2344,178 @@ footer.footer {
 
 /* tighten spacing utility */
 .row { display:flex; align-items:center; gap:8px; }
+
+/* ===== Feature modal ============================== */
+
+.feature-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: mermaidFadeIn 200ms ease-out;
+  padding: 5vh 4vw;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.feature-modal-close {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(52, 211, 153, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  color: #34d399;
+  cursor: pointer;
+  transition: background 150ms ease-out, color 150ms ease-out, transform 150ms ease-out;
+}
+
+.feature-modal-close:hover {
+  background: rgba(52, 211, 153, 0.2);
+  color: #6ee7b7;
+}
+
+.feature-modal-close:active {
+  transform: scale(0.93);
+}
+
+.feature-modal-close:focus-visible {
+  outline: 2px solid #34d399;
+  outline-offset: 3px;
+}
+
+.feature-modal-content {
+  max-width: 760px;
+  width: 100%;
+  background: rgba(15, 15, 23, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 2.5rem 2.5rem 3rem;
+  color: #e5e7eb;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.feature-modal-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.feature-modal-eyebrow {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #34d399;
+}
+
+.feature-modal-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #f9fafb;
+  margin: 0;
+}
+
+.feature-modal-body {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #d1d5db;
+}
+
+.feature-modal-body p {
+  margin: 0 0 1rem;
+}
+
+.feature-modal-body ol,
+.feature-modal-body ul {
+  margin: 0 0 1rem;
+  padding-left: 1.5rem;
+}
+
+.feature-modal-body li {
+  margin-bottom: 0.5rem;
+}
+
+.feature-modal-body strong {
+  color: #f3f4f6;
+  font-weight: 600;
+}
+
+.feature-modal-body code {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.9em;
+  color: #6ee7b7;
+}
+
+.feature-modal-stack {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.feature-modal-stack-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #34d399;
+  margin-bottom: 0.75rem;
+}
+
+.feature-modal-stack-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.feature-modal-stack-list li {
+  display: inline-block;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.75rem;
+  color: #d1d5db;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+@media (max-width: 640px) {
+  .feature-modal-backdrop {
+    padding: 3vh 3vw;
+  }
+  .feature-modal-close {
+    position: absolute;
+    top: 0.875rem;
+    right: 0.875rem;
+    width: 36px;
+    height: 36px;
+    z-index: 10;
+  }
+  .feature-modal-content {
+    position: relative;
+    overflow: visible;
+    padding: 3.5rem 1.5rem 2rem;
+  }
+  .feature-modal-title {
+    font-size: 1.4rem;
+  }
+}

@@ -9,6 +9,8 @@ import { InView } from "./Hero";
 import { Mermaid } from "./Mermaid";
 import { getKbArticles, getKbArticle } from "../api";
 import KbArticleModal from "./KbArticleModal";
+import FeatureModal from "./FeatureModal";
+import { FEATURE_MODALS } from "../featureModalsContent";
 
 
 const ARCHITECTURE_CHART = `
@@ -119,18 +121,21 @@ export const HowItWorks = () => (
 
 const FEATURES = [
   {
+    id: "rag",
     icon: <ITarget size={16} />,
     title: "Grounded diagnoses",
     desc: "Pulls from a curated knowledge base before consulting Claude - so answers cite real KB articles, not hallucinations.",
     link: "Read the RAG approach →",
   },
   {
+    id: "ranking",
     icon: <IBars size={16} />,
     title: "Probability-ranked causes",
     desc: "Top 3 causes ranked by likelihood, not just one guess. Pick the right diagnosis on the first try, even when symptoms overlap.",
     link: "See ranking model →",
   },
   {
+    id: "tickets",
     icon: <IDatabase size={16} />,
     title: "Persistent ticket history",
     desc: "Every diagnosis is saved as a ticket you can revisit, share with teammates, and use to train PatchPilot on your stack.",
@@ -138,29 +143,39 @@ const FEATURES = [
   },
 ];
 
-export const Features = () => (
-  <section id="features" style={{ paddingTop: 32 }}>
-    <div className="container">
-      <div className="section-head">
-        <span className="eyebrow">/ features</span>
-        <h2 className="section-title">Why technicians keep it open in a tab.</h2>
-        <p className="section-sub">
-          Three opinionated decisions that make PatchPilot different from pasting your error into a chat window.
-        </p>
+export function Features() {
+  const [openFeature, setOpenFeature] = useState(null);
+
+  return (
+    <section id="features" style={{ paddingTop: 32 }}>
+      <div className="container">
+        <div className="section-head">
+          <span className="eyebrow">/ features</span>
+          <h2 className="section-title">Why technicians keep it open in a tab.</h2>
+          <p className="section-sub">
+            Three opinionated decisions that make PatchPilot different from pasting your error into a chat window.
+          </p>
+        </div>
+        <div className="features">
+          {FEATURES.map((f, i) => (
+            <div key={i} className="feature">
+              <div className="feature-icon">{f.icon}</div>
+              <h3>{f.title}</h3>
+              <p>{f.desc}</p>
+              <button type="button" className="feature-link" onClick={() => setOpenFeature(f.id)}>{f.link}</button>
+            </div>
+          ))}
+        </div>
       </div>
-      <div className="features">
-        {FEATURES.map((f, i) => (
-          <div key={i} className="feature">
-            <div className="feature-icon">{f.icon}</div>
-            <h3>{f.title}</h3>
-            <p>{f.desc}</p>
-            <a className="feature-link" href="#">{f.link}</a>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-);
+      {openFeature && (
+        <FeatureModal
+          modal={FEATURE_MODALS[openFeature]}
+          onClose={() => setOpenFeature(null)}
+        />
+      )}
+    </section>
+  );
+}
 
 function formatCategory(cat) {
   if (!cat) return "";
@@ -349,7 +364,6 @@ export const Footer = () => (
 
       <div className="footer-fine">
         <span>© 2026 PatchPilot · Built by Arpit Patel</span>
-        <span className="mono">Made in Toronto, Canada</span>
       </div>
     </div>
   </footer>
