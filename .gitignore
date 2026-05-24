@@ -8,3 +8,34 @@
 /node_modules/
 /package.json
 /package-lock.json
+
+# ───── Maven / Java build output ─────
+target/
+*.class
+*.jar
+*.war
+*.ear
+hs_err_pid*.log
+
+# ───── Spring Boot ─────
+*.log
+logs/
+
+# ───── IDE files ─────
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+*.code-workspace
+
+# ───── OS files ─────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ───── Environment overrides ─────
+.env.local
+.env.*.local
+backend/.env
+*.env.bak
