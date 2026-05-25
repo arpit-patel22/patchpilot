@@ -39,3 +39,7 @@ desktop.ini
 .env.*.local
 backend/.env
 *.env.bak
+
+# Local scratch / personal notes
+*.docx
+*.scratch.*

@@ -7,7 +7,9 @@
 | Variable | Purpose | Local Default |
 |---|---|---|
 | `ANTHROPIC_API_KEY` | Claude API access | (required, no default) |
-| `MYSQL_PASSWORD` | MySQL DB password | `1234` (dev fallback) |
+| `DB_NAME` | PostgreSQL database name | (required) |
+| `DB_USERNAME` | PostgreSQL username | (required) |
+| `DB_PASSWORD` | PostgreSQL password | (required) |
 
 ### Frontend (set in `.env.development` for local, Vercel dashboard for prod)
 
@@ -19,12 +21,14 @@
 
 ```powershell
 $env:ANTHROPIC_API_KEY = "sk-ant-..."
-$env:MYSQL_PASSWORD = "your_password_here"
+$env:DB_NAME = "patchpilot"
+$env:DB_USERNAME = "your_db_user"
+$env:DB_PASSWORD = "your_db_password"
 cd backend
 .\mvnw.cmd spring-boot:run
 ```
 
 ## Deployment
 
-Backend: Render (Docker). Set MYSQL_PASSWORD, ANTHROPIC_API_KEY, CORS_ALLOWED_ORIGINS in Render dashboard.
-Frontend: Vercel. Set VITE_API_BASE_URL in Vercel dashboard pointing to Render backend URL.
+Backend: Render (Docker). Set `DB_NAME`, `DB_USERNAME`, `DB_PASSWORD`, `ANTHROPIC_API_KEY`, `CORS_ALLOWED_ORIGINS`, and `SPRING_PROFILES_ACTIVE=prod` in Render dashboard.
+Frontend: Vercel. Set `VITE_API_BASE_URL` in Vercel dashboard pointing to Render backend URL.

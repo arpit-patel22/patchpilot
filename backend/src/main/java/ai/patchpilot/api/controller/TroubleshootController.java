@@ -1,7 +1,6 @@
 package ai.patchpilot.api.controller;
 
 import ai.patchpilot.api.dto.DiagnosisResult;
-import ai.patchpilot.api.dto.StatusUpdateRequest;
 import ai.patchpilot.api.dto.TicketSummary;
 import ai.patchpilot.api.dto.TroubleshootRequest;
 import ai.patchpilot.api.dto.TroubleshootResponse;
@@ -11,18 +10,10 @@ import ai.patchpilot.api.repository.TroubleshootingTicketRepository;
 import ai.patchpilot.api.service.ClaudeService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
 import java.util.Map;
-
-import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Slf4j
 @RestController
@@ -98,60 +89,60 @@ public class TroubleshootController {
                 .build());
     }
 
-    @GetMapping("/tickets")
-    public Page<TicketSummary> listTickets(
-            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
-    ) {
-        long startedAt = System.currentTimeMillis();
-        Page<TroubleshootingTicket> tickets = ticketRepo.findAll(pageable);
-        Page<TicketSummary> result = tickets.map(this::toSummary);
-        long durationMs = System.currentTimeMillis() - startedAt;
-        log.info("GET /api/tickets page={} size={} returned {} of {} total in {}ms",
-                pageable.getPageNumber(), pageable.getPageSize(),
-                tickets.getNumberOfElements(), tickets.getTotalElements(), durationMs);
-        return result;
-    }
+    // SECURITY: disabled before public deployment.
+    // Exposes all user-submitted error details and AI diagnoses without authentication.
+    // Re-enable after adding admin-token middleware. See pre-deploy audit HIGH-1.
+    //
+    // @GetMapping("/tickets")
+    // public Page<TicketSummary> listTickets(
+    //         @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    // ) {
+    //     long startedAt = System.currentTimeMillis();
+    //     Page<TroubleshootingTicket> tickets = ticketRepo.findAll(pageable);
+    //     Page<TicketSummary> result = tickets.map(this::toSummary);
+    //     long durationMs = System.currentTimeMillis() - startedAt;
+    //     log.info("GET /api/tickets page={} size={} returned {} of {} total in {}ms",
+    //             pageable.getPageNumber(), pageable.getPageSize(),
+    //             tickets.getNumberOfElements(), tickets.getTotalElements(), durationMs);
+    //     return result;
+    // }
 
-    /**
-     * Returns a single ticket by ID, or 404 if not found.
-     * <p>Same response shape as /tickets — typed diagnosis, not stringified JSON.</p>
-     */
-    @GetMapping("/tickets/{id}")
-    public ResponseEntity<TicketSummary> getTicket(@PathVariable Long id) {
-        TroubleshootingTicket ticket = ticketRepo.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        NOT_FOUND,
-                        "Ticket with id " + id + " not found"
-                ));
-        return ResponseEntity.ok(toSummary(ticket));
-    }
+    // SECURITY: disabled before public deployment.
+    // Exposes individual ticket data (error logs, AI diagnosis) without authentication.
+    // Re-enable after adding admin-token middleware. See pre-deploy audit HIGH-1.
+    //
+    // @GetMapping("/tickets/{id}")
+    // public ResponseEntity<TicketSummary> getTicket(@PathVariable Long id) {
+    //     TroubleshootingTicket ticket = ticketRepo.findById(id)
+    //             .orElseThrow(() -> new ResponseStatusException(
+    //                     NOT_FOUND,
+    //                     "Ticket with id " + id + " not found"
+    //             ));
+    //     return ResponseEntity.ok(toSummary(ticket));
+    // }
 
-    /**
-     * Updates a ticket's status (OPEN / RESOLVED / ESCALATED). Returns 404 if the
-     * ticket doesn't exist, 400 if the request body is missing the status field.
-     *
-     * <p>Transition rules are deliberately liberal: any status can change to any
-     * other status. This matches a real support workflow where tickets get
-     * reopened, escalated and de-escalated, or resolved in any order.</p>
-     */
-    @PatchMapping("/tickets/{id}/status")
-    public ResponseEntity<TicketSummary> updateStatus(@PathVariable Long id,
-                                                      @Valid @RequestBody StatusUpdateRequest request) {
-        TroubleshootingTicket ticket = ticketRepo.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        NOT_FOUND,
-                        "Ticket with id " + id + " not found"
-                ));
-
-        TroubleshootingTicket.Status previousStatus = ticket.getStatus();
-        ticket.setStatus(request.getStatus());
-        ticket = ticketRepo.save(ticket);
-
-        log.info("Status updated: ticketId={}, {} -> {}",
-                ticket.getId(), previousStatus, request.getStatus());
-
-        return ResponseEntity.ok(toSummary(ticket));
-    }
+    // SECURITY: disabled before public deployment.
+    // Allows unauthenticated mutation of ticket state (OPEN/RESOLVED/ESCALATED).
+    // Re-enable after adding admin-token middleware. See pre-deploy audit HIGH-2.
+    //
+    // @PatchMapping("/tickets/{id}/status")
+    // public ResponseEntity<TicketSummary> updateStatus(@PathVariable Long id,
+    //                                                   @Valid @RequestBody StatusUpdateRequest request) {
+    //     TroubleshootingTicket ticket = ticketRepo.findById(id)
+    //             .orElseThrow(() -> new ResponseStatusException(
+    //                     NOT_FOUND,
+    //                     "Ticket with id " + id + " not found"
+    //             ));
+    //
+    //     TroubleshootingTicket.Status previousStatus = ticket.getStatus();
+    //     ticket.setStatus(request.getStatus());
+    //     ticket = ticketRepo.save(ticket);
+    //
+    //     log.info("Status updated: ticketId={}, {} -> {}",
+    //             ticket.getId(), previousStatus, request.getStatus());
+    //
+    //     return ResponseEntity.ok(toSummary(ticket));
+    // }
 
     /**
      * Lightweight health check for uptime monitoring and smoke tests.

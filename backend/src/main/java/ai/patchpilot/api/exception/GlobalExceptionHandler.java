@@ -9,8 +9,8 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -80,6 +80,20 @@ public class GlobalExceptionHandler {
                 "status", status.value(),
                 "error", HttpStatus.valueOf(status.value()).getReasonPhrase(),
                 "message", ex.getReason() != null ? ex.getReason() : "Request failed"
+        ));
+    }
+
+    /**
+     * Handles requests to URLs that have no controller mapping (e.g., disabled
+     * /api/tickets endpoints). Returns a proper 404 instead of falling through
+     * to the generic 500 handler.
+     */
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleNoHandler(NoHandlerFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                "status", HttpStatus.NOT_FOUND.value(),
+                "error", "Not Found",
+                "message", "No endpoint exists for " + ex.getHttpMethod() + " " + ex.getRequestURL()
         ));
     }
 

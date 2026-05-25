@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import {
   IPencil, ISparkles, ICheck, ITarget,
-  IBars, IDatabase, IArrowRight, IGithub,
+  IBars, IDatabase, IGithub,
   ILinkedIn, IMail
 } from "./Icons";
 import { InView } from "./Hero";
