@@ -154,7 +154,7 @@ export const Hero = ({ gradient }) =>
         <span className="dot" />
         <span><strong>AI-powered IT support</strong></span>
         <span className="sep">·</span>
-        <span>Now in beta</span>
+        <span>Open source</span>
       </div>
 
 <h1 className="hero-title anim-title">
