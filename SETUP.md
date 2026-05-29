@@ -7,6 +7,7 @@
 | Variable | Purpose | Local Default |
 |---|---|---|
 | `ANTHROPIC_API_KEY` | Claude API access | (required, no default) |
+| `DB_HOST` | Database hostname | `localhost` (set to RDS endpoint in production) |
 | `DB_NAME` | PostgreSQL database name | (required) |
 | `DB_USERNAME` | PostgreSQL username | (required) |
 | `DB_PASSWORD` | PostgreSQL password | (required) |
