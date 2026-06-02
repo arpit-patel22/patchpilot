@@ -342,10 +342,10 @@ export const Footer = () => (
         <div className="footer-cols">
           <div className="footer-col">
             <div className="footer-col-title">Connect</div>
-            <a href="#" target="_blank" rel="noopener noreferrer">
+            <a href="https://github.com/arpit-patel22/patchpilot" target="_blank" rel="noopener noreferrer">
               <IGithub size={13} /> GitHub
             </a>
-            <a href="#" target="_blank" rel="noopener noreferrer">
+            <a href="https://www.linkedin.com/in/arpit-patel-dev" target="_blank" rel="noopener noreferrer">
               <ILinkedIn size={13} /> LinkedIn
             </a>
             <a href="mailto:YOUR_EMAIL_HERE">

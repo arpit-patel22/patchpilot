@@ -184,7 +184,7 @@ export const Hero = ({ gradient }) =>
             <IArrowRight size={15} />
           </span>
         </a>
-        <a className="btn btn-secondary btn-large" href="#" target="_blank" rel="noopener noreferrer">
+        <a className="btn btn-secondary btn-large" href="https://github.com/arpit-patel22/patchpilot" target="_blank" rel="noopener noreferrer">
           <IGithub size={14} />
           View on GitHub
         </a>
