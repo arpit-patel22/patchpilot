@@ -19,10 +19,10 @@ export const DiagnoseSection = () => {
   // Form state
   const [software, setSoftware] = React.useState("");
   const [softwareVersion, setSoftwareVersion] = React.useState("");
-  const [osVersion, setOsVersion] = React.useState("Windows 11");
+  const [osVersion, setOsVersion] = React.useState("null");
   const [errorMessage, setErrorMessage] = React.useState("");
   const [userAttempts, setUserAttempts] = React.useState("");
-  const [severity, setSeverity] = React.useState("INCONVENIENT");
+  const [severity, setSeverity] = React.useState("null");
 
   // Async state
   const [loading, setLoading] = React.useState(false);
@@ -30,14 +30,14 @@ export const DiagnoseSection = () => {
   const [result, setResult] = React.useState(null);
   const [elapsedMs, setElapsedMs] = React.useState(null);
 
-  const canSubmit = software.trim() && errorMessage.trim() && !loading;
+  const canSubmit = software.trim() && errorMessage.trim() && osVersion && severity && !loading;
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
 
     setLoading(true);
     setError(null);
-    setResult(null);
+    setResult(null);  
     setElapsedMs(null);
 
     const startedAt = performance.now();
