@@ -142,7 +142,7 @@ export const DiagnoseSection = () => {
                   color: loading ? "var(--amber)" : "var(--emerald)",
                 }}
               >
-                {loading ? "● analyzing..." : "● ready"}
+                {loading ? "● running diagnostics..." : "● ready"}
               </span>
             </div>
 
@@ -315,7 +315,7 @@ export const DiagnoseSection = () => {
             {/* LOADING STATE */}
             {loading && (
               <div className="diag-card">
-                <div className="diag-rank">CALLING CLAUDE...</div>
+                <div className="diag-rank">ANALYZING ERROR...</div>
                 <div className="diag-title">
                   Analyzing your error against the knowledge base. This
                   typically takes 2-5 seconds.
