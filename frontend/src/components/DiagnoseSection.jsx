@@ -5,8 +5,8 @@ import { diagnose } from "../api";
 
 const OS_OPTIONS = [
   { id: "Windows 11", label: "Windows" },
-  { id: "macOS", label: "macOS" },
-  { id: "Linux", label: "Linux" },
+  { id: "macOS", label: "macOS", disabled: true },
+  { id: "Linux", label: "Linux", disabled: true },
 ];
 
 const SEVERITY_OPTIONS = [
@@ -177,11 +177,29 @@ export const DiagnoseSection = () => {
                     className={
                       "os-pill " + (osVersion === o.id ? "active" : "")
                     }
-                    onClick={() => setOsVersion(o.id)}
-                    disabled={loading}
+                    onClick={() => !o.disabled && setOsVersion(o.id)}
+                    disabled={loading || o.disabled}
                     type="button"
+                    title={
+                      o.disabled ? "Coming in v2 — Windows KB only for now" : ""
+                    }
+                    style={
+                      o.disabled ? { opacity: 0.4, cursor: "not-allowed" } : {}
+                    }
                   >
                     {o.label}
+                    {o.disabled && (
+                      <span
+                        style={{
+                          fontSize: 9,
+                          marginLeft: 4,
+                          color: "var(--text-tertiary)",
+                          fontFamily: "monospace",
+                        }}
+                      >
+                        v2
+                      </span>
+                    )}
                   </button>
                 ))}
               </div>
