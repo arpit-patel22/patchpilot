@@ -84,16 +84,21 @@ export const DiagnoseSection = () => {
       <div className="container">
         <div className="section-head center" style={{ textAlign: "center" }}>
           <span className="eyebrow">/ try it now</span>
-          <h2 className="section-title">Diagnose a real installation failure.</h2>
+          <h2 className="section-title">
+            Diagnose a real installation failure.
+          </h2>
           <p className="section-sub" style={{ margin: "0 auto" }}>
-            Paste your error below. Claude will analyze it against the curated KB
-            and return ranked root causes with fix steps.
+            Paste your error below. Claude will analyze it against the curated
+            KB and return ranked root causes with fix steps.
           </p>
         </div>
 
         <div className="diagnose-wrap" onKeyDown={handleKeyDown}>
           {/* LEFT: form */}
-          <div className="pp-form" style={{ borderRight: "1px solid var(--border)" }}>
+          <div
+            className="pp-form"
+            style={{ borderRight: "1px solid var(--border)" }}
+          >
             <div className="pp-form-head">
               <div className="pp-form-title">
                 New diagnosis
@@ -101,7 +106,10 @@ export const DiagnoseSection = () => {
               </div>
               <span
                 className="mono"
-                style={{ fontSize: 11, color: loading ? "var(--amber)" : "var(--emerald)" }}
+                style={{
+                  fontSize: 11,
+                  color: loading ? "var(--amber)" : "var(--emerald)",
+                }}
               >
                 {loading ? "● analyzing..." : "● ready"}
               </span>
@@ -135,7 +143,9 @@ export const DiagnoseSection = () => {
                 {OS_OPTIONS.map((o) => (
                   <button
                     key={o.id}
-                    className={"os-pill " + (osVersion === o.id ? "active" : "")}
+                    className={
+                      "os-pill " + (osVersion === o.id ? "active" : "")
+                    }
                     onClick={() => setOsVersion(o.id)}
                     disabled={loading}
                     type="button"
@@ -196,7 +206,10 @@ export const DiagnoseSection = () => {
             >
               <ISparkles size={14} />
               {loading ? "Diagnosing..." : "Diagnose"}
-              <span className="mono" style={{ fontSize: 11, opacity: 0.65, marginLeft: 4 }}>
+              <span
+                className="mono"
+                style={{ fontSize: 11, opacity: 0.65, marginLeft: 4 }}
+              >
                 ⌘↵
               </span>
             </button>
@@ -211,7 +224,12 @@ export const DiagnoseSection = () => {
                 {causes.length > 0 && (
                   <span
                     className="mono"
-                    style={{ fontSize: 11, color: "var(--text-tertiary)", fontWeight: 400, marginLeft: 4 }}
+                    style={{
+                      fontSize: 11,
+                      color: "var(--text-tertiary)",
+                      fontWeight: 400,
+                      marginLeft: 4,
+                    }}
                   >
                     {causes.length} ranked
                   </span>
@@ -219,7 +237,8 @@ export const DiagnoseSection = () => {
               </div>
               {elapsedMs && (
                 <div className="runtime">
-                  resolved in <b>{(elapsedMs / 1000).toFixed(1)}s</b> · grounded ✓
+                  resolved in <b>{(elapsedMs / 1000).toFixed(1)}s</b> · grounded
+                  ✓
                 </div>
               )}
             </div>
@@ -245,10 +264,17 @@ export const DiagnoseSection = () => {
               <div className="diag-card">
                 <div className="diag-rank">CALLING CLAUDE...</div>
                 <div className="diag-title">
-                  Analyzing your error against the knowledge base. This typically takes 2-5 seconds.
+                  Analyzing your error against the knowledge base. This
+                  typically takes 2-5 seconds.
                 </div>
                 <div className="prob-bar">
-                  <div className="prob-bar-fill" style={{ width: "100%", animation: "drift 1.5s ease-in-out infinite alternate" }} />
+                  <div
+                    className="prob-bar-fill"
+                    style={{
+                      width: "100%",
+                      animation: "drift 1.5s ease-in-out infinite alternate",
+                    }}
+                  />
                 </div>
               </div>
             )}
@@ -257,12 +283,52 @@ export const DiagnoseSection = () => {
             {!loading && !error && !result && (
               <div
                 className="diag-card"
-                style={{ borderStyle: "dashed", opacity: 0.6, cursor: "default" }}
+                style={{
+                  borderStyle: "dashed",
+                  opacity: 0.6,
+                  cursor: "default",
+                }}
               >
                 <div className="diag-rank">NO DIAGNOSIS YET</div>
                 <div className="diag-title">
-                  Fill out the form and click <b>Diagnose</b> to send your error to the AI for analysis.
+                  Fill out the form and click <b>Diagnose</b> to send your error
+                  to the AI for analysis.
                 </div>
+              </div>
+            )}
+
+            {/* TICKET ID */}
+            {result?.ticketId && (
+              <div
+                style={{
+                  padding: "10px 16px",
+                  border: "1px solid var(--border)",
+                  borderRadius: 8,
+                  background: "rgba(255,255,255,0.03)",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 12,
+                    color: "var(--text-tertiary)",
+                    fontFamily: "monospace",
+                  }}
+                >
+                  TICKET ID
+                </span>
+                <span
+                  style={{
+                    fontSize: 13,
+                    color: "var(--text-primary)",
+                    fontFamily: "monospace",
+                    fontWeight: 600,
+                  }}
+                >
+                  #{result.ticketId}
+                </span>
               </div>
             )}
 
@@ -279,10 +345,21 @@ export const DiagnoseSection = () => {
                   alignItems: "flex-start",
                 }}
               >
-                <ISparkles size={16} style={{ color: "var(--accent)", flexShrink: 0, marginTop: 2 }} />
+                <ISparkles
+                  size={16}
+                  style={{
+                    color: "var(--accent)",
+                    flexShrink: 0,
+                    marginTop: 2,
+                  }}
+                />
                 <div>
-                  <div className="diag-rank" style={{ color: "var(--accent)" }}>TRY THIS FIRST</div>
-                  <div className="diag-title" style={{ marginTop: 4 }}>{tryThisFirst}</div>
+                  <div className="diag-rank" style={{ color: "var(--accent)" }}>
+                    TRY THIS FIRST
+                  </div>
+                  <div className="diag-title" style={{ marginTop: 4 }}>
+                    {tryThisFirst}
+                  </div>
                 </div>
               </div>
             )}
@@ -296,24 +373,44 @@ export const DiagnoseSection = () => {
                 <div className="diag-top">
                   <div style={{ minWidth: 0 }}>
                     <div className="diag-rank">
-                      #{String(i + 1).padStart(2, "0")} {i === 0 && "· most likely"}
+                      #{String(i + 1).padStart(2, "0")}{" "}
+                      {i === 0 && "· most likely"}
                     </div>
                     <div className="diag-title">{cause.name}</div>
                   </div>
                   <div className="diag-prob">{cause.probability}%</div>
                 </div>
                 <div className="prob-bar">
-                  <div className="prob-bar-fill" style={{ width: `${cause.probability}%` }} />
+                  <div
+                    className="prob-bar-fill"
+                    style={{ width: `${cause.probability}%` }}
+                  />
                 </div>
                 {cause.explanation && (
-                  <div style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.55 }}>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      color: "var(--text-secondary)",
+                      lineHeight: 1.55,
+                    }}
+                  >
                     {cause.explanation}
                   </div>
                 )}
-              {cause.steps && cause.steps.length > 0 && (
+                {cause.steps && cause.steps.length > 0 && (
                   <details className="fix-steps">
                     <summary className="fix-steps-summary">
-                      <svg className="fix-steps-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <svg
+                        className="fix-steps-chevron"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
                         <path d="M9 18l6-6-6-6" />
                       </svg>
                       <span>View {cause.steps.length} fix steps</span>
