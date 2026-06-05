@@ -224,11 +224,13 @@ html {
   transition: background 300ms ease-out, border-color 300ms ease-out, box-shadow 300ms ease-out, backdrop-filter 300ms ease-out;
 }
 .nav-blur .nav-pill {
-  background: rgba(15, 23, 42, 0.7);
+  background: rgba(15, 15, 23, 0.97);
   border-color: rgba(51, 65, 85, 0.6);
   backdrop-filter: blur(40px) saturate(180%);
   -webkit-backdrop-filter: blur(40px) saturate(180%);
   box-shadow: 0 25px 50px -12px rgba(2, 6, 23, 0.5), 0 0 0 1px rgba(255,255,255,0.02);
+  isolation: isolate;
+  will-change: backdrop-filter;
 }
 .nav-inner { display: contents; }
 .nav-brand {
