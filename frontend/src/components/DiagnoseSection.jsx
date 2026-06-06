@@ -175,30 +175,34 @@ export const DiagnoseSection = () => {
                   <button
                     key={o.id}
                     className={
-                      "os-pill " + (osVersion === o.id ? "active" : "")
+                      "os-pill " +
+                      (osVersion === o.id ? "active" : "") +
+                      (o.disabled ? " os-pill-disabled" : "")
                     }
                     onClick={() => !o.disabled && setOsVersion(o.id)}
                     disabled={loading || o.disabled}
                     type="button"
-                    title={
-                      o.disabled ? "Coming in v2 — Windows KB only for now" : ""
-                    }
-                    style={
-                      o.disabled ? { opacity: 0.4, cursor: "not-allowed" } : {}
-                    }
                   >
                     {o.label}
                     {o.disabled && (
-                      <span
-                        style={{
-                          fontSize: 9,
-                          marginLeft: 4,
-                          color: "var(--text-tertiary)",
-                          fontFamily: "monospace",
-                        }}
-                      >
-                        v2
-                      </span>
+                      <>
+                        <span
+                          style={{
+                            fontSize: 9,
+                            marginLeft: 4,
+                            color: "var(--text-tertiary)",
+                            fontFamily: "monospace",
+                            border: "1px solid var(--border)",
+                            padding: "0 4px",
+                            borderRadius: 4,
+                          }}
+                        >
+                          v2
+                        </span>
+                        <span className="os-tooltip">
+                          Coming in v2
+                        </span>
+                      </>
                     )}
                   </button>
                 ))}

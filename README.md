@@ -1,52 +1,138 @@
 # PatchPilot
 
-A diagnostic assistant for IT support technicians. Paste a Windows installation error in plain language and PatchPilot returns three probability-ranked causes with fix steps. The answers are grounded in a small knowledge base of real install failures, not pulled from whatever Claude happens to remember.
+A diagnostic tool for IT support work. Paste a Windows installation error, get three ranked causes with fix steps. Answers come from a small KB of real install failures first — Claude fills in the gaps, not the other way around.
 
-## Live demo
+**Live:** [patchpilot.online](https://patchpilot.online) · [GitHub](https://github.com/arpit-patel22/patchpilot)
 
-Backend on AWS Elastic Beanstalk with RDS PostgreSQL. Frontend on Vercel.
+---
 
-Live URL: _added after deployment_
+## The problem it solves
 
-## Why this exists
+Paste "MSI Error 1603" into ChatGPT and you get one confident answer that's wrong about half the time. Real install failures have multiple plausible causes, and the symptom alone rarely tells you which one you're looking at.
 
-If you paste "MSI Error 1603" into ChatGPT, you get one confident answer that's wrong half the time. Real install failures have multiple plausible causes, and the symptom rarely tells you which one you're looking at.
+PatchPilot runs a small RAG pipeline instead. When you submit an error, the backend fuzzy-matches it against eight hand-written KB articles covering the install failures that actually show up in tickets. Matching articles get injected into Claude's prompt as context. Claude returns three causes ranked by probability, each with step-by-step fixes that reference the articles used to generate them.
 
-PatchPilot uses a small RAG pipeline to fix that. When a technician submits an error, the backend matches keywords against a knowledge base of eight hand-written articles on common Windows install failures, injects the matches into Claude's prompt as context, and asks Claude for three ranked causes with fix steps. The technician gets useful suggestions instead of one confident guess, and the answers cite articles that actually exist.
+Eight articles is a deliberately small KB — I wrote them by hand rather than scraping forums. The pipeline doesn't care if there are 8 or 800.
 
-Eight articles is a small KB. I wrote them by hand to cover the install failures that show up most often, and the pipeline doesn't care if there are 8 or 800.
+---
+
+## Stack
+
+| Layer | Tech |
+|---|---|
+| Backend | Java 21, Spring Boot 4.0.6, Spring Data JPA, Hibernate, Bucket4j |
+| Frontend | React 19, Vite 8, Tailwind CSS v4, Axios, React Markdown |
+| Database | PostgreSQL 18 via AWS RDS |
+| AI | Anthropic Claude Sonnet 4.5 |
+| Infrastructure | AWS Elastic Beanstalk, AWS RDS, AWS CloudFront, AWS Amplify |
+| Domain | patchpilot.online (Namecheap → AWS Route 53) |
+
+---
 
 ## Architecture
 
 ```
 User
-  -> React frontend (Vercel)
-  -> Spring Boot API (AWS Elastic Beanstalk)
-  -> KB lookup (RDS PostgreSQL)
-  -> Anthropic Claude API with KB-injected prompt
-  -> Ranked diagnosis returned to user
-  -> Ticket saved to Postgres
+  → React frontend (AWS Amplify)
+  → CloudFront (HTTPS termination + CDN)
+  → Spring Boot API (AWS Elastic Beanstalk, t3.micro)
+  → KB fuzzy-match (RDS PostgreSQL)
+  → Claude Sonnet 4.5 (Anthropic API, KB-injected prompt)
+  → Ranked diagnosis returned to user
+  → Ticket saved to Postgres
 ```
 
-## Tech stack
+CloudFront sits in front of the EB backend to solve the HTTPS/mixed-content problem — Amplify serves HTTPS, EB runs HTTP, CloudFront bridges them.
 
-Backend: Java 21, Spring Boot 4.0.6, Spring Data JPA, PostgreSQL 18, Bucket4j for rate limiting, Maven.
-
-Frontend: React 19, Vite 8, Tailwind CSS v4, Axios, Framer Motion, React Markdown.
-
-AI: Anthropic Claude Sonnet 4.5.
-
-Infrastructure: AWS Elastic Beanstalk, AWS RDS, Vercel.
+---
 
 ## What it does
 
-The diagnose endpoint returns three causes ranked by probability. Each cause has a severity (CURIOUS, INCONVENIENT, or BLOCKING) and step-by-step fixes that reference the KB articles used to generate them.
+Submit a software name, OS, error message, and severity level (CURIOUS / INCONVENIENT / BLOCKING). The backend:
 
-Diagnose is rate-limited to five requests per IP per hour via Bucket4j, which keeps the Anthropic bill bounded if anyone decides to hammer the endpoint.
+1. Fuzzy-matches the error against the KB
+2. Injects matching articles into Claude's system prompt
+3. Asks Claude for three ranked causes with fix steps
+4. Saves the result as a ticket in Postgres
+5. Returns the diagnosis with a ticket ID
 
-The 8-article KB covers the install failures that actually show up in tickets: MSI 1603, missing VC++ redist, antivirus blocks, disk space, UAC elevation, leftover conflicting installs, .NET version mismatches, and Windows Installer service issues.
+Each diagnosis includes a "Try this first" quick fix, three probability-ranked causes with percentage scores, expandable fix steps per cause, and a ticket ID for reference.
 
-Other details worth knowing: every diagnosis is saved as a ticket through JPA. CORS origins come from an environment variable instead of a wildcard. Dev and prod use separate Spring profiles, so SQL logging is on locally and off in production, and Hibernate auto-migrates the schema in dev but only validates it in prod.
+The diagnose endpoint is rate-limited to five requests per IP per hour via Bucket4j. `ForwardedHeaderFilter` is registered so Spring reads real client IPs from CloudFront's forwarded headers instead of the internal EB address.
+
+---
+
+## Knowledge base
+
+Eight articles covering the failures that actually show up in tickets:
+
+- MSI Error 1603 (catch-all fatal installer error)
+- Missing VC++ Redistributable
+- Antivirus / SmartScreen blocking installer execution
+- Insufficient disk space
+- UAC elevation / administrator permissions
+- Conflicting older version still installed
+- .NET Framework version mismatch
+- Windows Installer service not running (Error 1719)
+
+macOS and Linux coverage is planned for v2.
+
+---
+
+## Security
+
+- CORS locked to `patchpilot.online` — no wildcard
+- Rate limiting via Bucket4j (5 req/IP/hour on `/api/diagnose`)
+- `ForwardedHeaderFilter` — real client IP from CloudFront, not internal proxy IP
+- Security headers on all responses: `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `X-XSS-Protection`
+- DB credentials and API keys in environment variables only — nothing in code or git history
+- RDS not publicly accessible — only reachable from the EB security group
+- Separate Spring profiles for dev and prod (SQL logging off, DDL validate-only in prod)
+- Anthropic API budget capped — auto-reload disabled
+
+---
+
+## API endpoints
+
+**Public:**
+```
+GET  /api/health
+POST /api/diagnose        (rate-limited 5/IP/hour)
+GET  /api/kb              (?category=...&limit=N)
+GET  /api/kb/{id}
+```
+
+**Disabled pending auth:**
+```
+GET   /api/tickets
+GET   /api/tickets/{id}
+PATCH /api/tickets/{id}/status
+```
+
+---
+
+## Running locally
+
+You need Java 21, Node 20+, PostgreSQL 18, and an Anthropic API key.
+
+**Backend:**
+```bash
+cd backend
+cp .env.example .env
+# set DB_HOST, DB_NAME, DB_USERNAME, DB_PASSWORD, ANTHROPIC_API_KEY
+./mvnw spring-boot:run
+```
+
+**Frontend:**
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Backend runs on 8080, frontend on 5173. `VITE_API_BASE_URL` defaults to `http://localhost:8080/api` if not set.
+
+---
 
 ## Project structure
 
@@ -54,12 +140,12 @@ Other details worth knowing: every diagnosis is saved as a ticket through JPA. C
 patchpilot/
   backend/
     src/main/java/ai/patchpilot/api/
-      controller/    REST endpoints
-      service/       Claude API integration, business logic
-      dto/           Request/response types
-      model/         JPA entities
-      config/        CORS, rate limiting
-      exception/     Centralized error handling
+      controller/     REST endpoints
+      service/        Claude integration, business logic
+      dto/            Request/response types
+      model/          JPA entities
+      config/         CORS, rate limiting
+      exception/      Global error handling
     src/main/resources/
       application.properties
       application-dev.properties
@@ -67,72 +153,44 @@ patchpilot/
     pom.xml
   frontend/
     src/
-      components/
-      api.js
+      components/     React components
+      api.js          Axios client
       featureModalsContent.js
+    amplify.yml       Amplify build + security headers config
     package.json
     vite.config.js
-  SETUP.md
   README.md
   .gitignore
 ```
 
-## Running locally
-
-You need Java 21, Node 20+, PostgreSQL 18, and an Anthropic API key.
-
-Backend:
-
-```
-cd backend
-cp .env.example .env
-# fill in DB_NAME, DB_USERNAME, DB_PASSWORD, ANTHROPIC_API_KEY
-./mvnw spring-boot:run
-```
-
-Frontend:
-
-```
-cd frontend
-npm install
-npm run dev
-```
-
-Backend runs on 8080, frontend on 5173. The frontend defaults `VITE_API_BASE_URL` to `http://localhost:8080/api` if you don't set it.
-
-Full setup notes are in SETUP.md.
-
-## API endpoints
-
-Public:
-- `GET /api/health` — liveness check
-- `POST /api/diagnose` — submit an error, get ranked diagnosis (rate-limited)
-- `GET /api/kb?category=...&limit=N` — list KB article summaries
-- `GET /api/kb/{id}` — full KB article
-
-Disabled until admin auth is built:
-- `GET /api/tickets`
-- `GET /api/tickets/{id}`
-- `PATCH /api/tickets/{id}/status`
+---
 
 ## Design decisions
 
-**RAG over fine-tuning.** Fine-tuning on eight articles would be expensive and you'd have to retrain every time the KB changes. RAG lets the KB grow without retraining and keeps each article traceable to a real document.
+**RAG over fine-tuning.** Fine-tuning on eight articles would be expensive and you'd retrain every time the KB changes. RAG keeps each answer traceable to a real document and lets the KB grow without touching the model.
 
-**Diagnosis JSON stored as TEXT.** A diagnosis is three nested causes with multiple fix steps and KB references. The shape was still moving when I built this, so I stored the raw JSON in a TEXT column and parse to typed DTOs at the API boundary. A normalized schema is the right call once the format settles down. It hasn't.
+**Diagnosis JSON stored as TEXT.** A diagnosis is three nested causes, each with probability, explanation, fix steps, and KB references. The shape was still moving when I built this — storing raw JSON in a TEXT column and parsing to typed DTOs at the API boundary was the practical call. Normalized schema is the right move once the format settles.
 
-**Custom severity labels instead of low/medium/high.** Generic severity scales don't help when you're triaging tickets. I went with CURIOUS, INCONVENIENT, and BLOCKING because those words tell you what to do: look at it later, fix it now, or drop everything because the user can't work.
+**Custom severity labels.** CURIOUS, INCONVENIENT, BLOCKING beats low/medium/high for IT triage. Those words actually tell you what to do next.
 
-**Ticket endpoints disabled in production.** The list and detail endpoints return every user's submitted error logs and AI diagnoses, with no auth in front of them. Building admin auth was out of scope for the MVP, so disabling them was the safe move. They come back once auth is in.
+**Ticket endpoints disabled.** The list and detail endpoints return submitted error logs and AI diagnoses with no auth in front of them. Disabling them was safer than shipping them open. They come back when JWT auth is in.
+
+**CloudFront as HTTPS bridge.** Amplify serves the frontend over HTTPS. EB runs HTTP. Browsers block HTTPS pages calling HTTP APIs. CloudFront in front of EB solves this without needing a load balancer (which would cost ~$16/month and break the free tier).
+
+---
 
 ## Roadmap
 
-- Admin auth on ticket endpoints so they can come back online
-- Trust the cloud proxy's headers properly so the rate limiter uses real client IPs
-- More KB articles. macOS and Linux are the obvious next categories
-- A ticket dashboard UI that uses the pagination API I already wired up
+- JWT auth on ticket endpoints
+- Ticket dashboard UI (pagination API already wired up)
+- macOS and Linux KB articles
 - Vector embeddings on KB articles instead of fuzzy keyword matching
+- `ForwardedHeaderFilter` trust config refinement once EB proxy IPs are stable
+
+---
 
 ## About
 
-Built by Arpit Patel. Computer Programming Graduate. This is a portfolio project. GitHub, LinkedIn, and email links are in the footer of the deployed site.
+Built by Arpit Patel — Computer Programming student at Humber College, Toronto. Portfolio project.
+
+[GitHub](https://github.com/arpit-patel22/patchpilot) · [LinkedIn](https://www.linkedin.com/in/arpit-patel-dev) · [Live Demo](https://patchpilot.online)
